@@ -1,0 +1,55 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}The Times | Home {% endblock %}
+
+{% block izquierda %}
+
+      <h2>{% if this_item.consumido%}&#9989;&nbsp;{%endif%}{{this_item.titulo}}{% if this_item.periodo %}&nbsp;{{this_item.periodo}}{% endif %}<a href="{% url 'editItem' this_item.id %}" style="text-decoration:none; color:grey;">&#x1F4DD;</a></h2>
+      <br><br>
+
+
+      <form method="POST">
+        {% csrf_token %}
+        <label>Start Date:</label><br>
+        <input type="text" name="fec_ini" style="padding:0.4em;"><br><br>
+        <label>Finish Date:</label><br>
+        <input type="text" name="fec_fin" style="padding:0.4em;"><br><br>
+        <label>Format:</label><br>
+        <select name="formato" style="padding:0.4em;">
+          {% for f in formatos %}
+            <option value="{{f}}">{{f}}</option>
+          {% endfor %}
+        </select><br><br>
+        <label>Units:</label><br>
+        <select name="unidades" style="padding:0.4em;">
+          {% for f in units %}
+            <option value="{{f}}">{{f}}</option>
+          {% endfor %}
+        </select><br><br>
+        <label>Quantity:</label><br>
+        <input type="text" name="cantidad" style="padding:0.4em;"><br><br>
+        <label>Multiplicator (Avg Duration):</label><br>
+        <input type="text" name="multiplicador" value="1" style="padding:0.4em;"><br><br>
+        <input type="submit" value="Start Consumo">
+        
+        
+      </form>
+
+
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+  
+</ul>
+{% endblock %}

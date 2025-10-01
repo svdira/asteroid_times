@@ -9,4 +9,6 @@ urlpatterns = [
 	path('add-item/', views.addItem, name='addItem'),
 	path('edit-item/<i>', views.editItem, name='editItem'),
 	path('item/<i>', views.item, name='item'),
+	path('category/<c>', views.categoria, name='categoria'),
+	path('start-consumo/<i>', views.startConsumo, name='startConsumo'),
 	]

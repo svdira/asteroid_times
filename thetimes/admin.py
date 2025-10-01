@@ -8,4 +8,5 @@ admin.site.register(AttrImage)
 admin.site.register(AttrDate)
 admin.site.register(AttrInteger)
 admin.site.register(AttrText)
+admin.site.register(Consumo)
 

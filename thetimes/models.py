@@ -38,6 +38,7 @@ class Item(models.Model):
     contenido = models.TextField()
     fecha_creacion = models.DateTimeField()
     fecha_edicion = models.DateTimeField()
+    consumido = models.BooleanField(default=False)
 
     @property
     def headtext(self):
@@ -55,6 +56,67 @@ class Item(models.Model):
         else:
             this_texto = self.contenido.replace('==headtext==','')
         return(markdown.markdown(this_texto,extensions=['extra']))
+
+
+    @property
+    def credit_links(self):
+
+        if self.tipo.category == 'book':
+            ncreds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym']).count()
+            if ncreds > 0:
+                creds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym'])
+
+                enlaces = ""
+
+                for c in creds:
+                    if c.rel_name != 'author':
+                        this_c = "(" + c.credito +")"
+                    else:
+                        this_c = ""
+                    enlaces = enlaces + "<a href='/item/"+str(c.item.id)+"' style='text-decoration:none; color:#6F8FAF;'>"+c.item.titulo+this_c+"</a>,&nbsp;"
+
+                clinks = enlaces = enlaces[:-7]
+            else:
+                clinks = None
+        else:
+            clinks = None
+
+        return clinks
+
+    @property
+    def periodo(self):
+        this_v = None
+        if self.tipo.category == 'book':
+            npubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').count()
+            if npubyear > 0:
+                pubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').latest('id')
+                this_v = f"({pubyear.att_value})"
+        if self.tipo.category == 'movie':
+            npubyear = AttrInteger.objects.filter(item=self,att_name='premiere').count()
+            if npubyear > 0:
+                pubyear = AttrInteger.objects.filter(item=self,att_name='premiere').latest('id')
+                this_v = f"({pubyear.att_value})"
+
+        return this_v
+
+    @property
+    def mainPic(self):
+        npics = AttrImage.objects.filter(item=self,tipo='cover').count()
+        if npics == 0:
+            return None
+        else:
+            pks = AttrImage.objects.filter(item=self,tipo='cover').values_list('pk', flat=True)
+            random_pk = choice(pks)
+            ppic = AttrImage.objects.get(pk=random_pk)
+            return ppic.imagen.url
+
+    @property
+    def aplica_consumo(self):
+        if self.tipo.category in ['book','movie','light novel volume','tv series','anime']:
+            return True
+        else:
+            return None
+
 
     def __str__(self):
         return self.titulo

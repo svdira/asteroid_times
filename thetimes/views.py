@@ -19,7 +19,7 @@ def plantilla(request):
 	return render(request,'base_times.html',{})
 
 def addItem(request):
-	cats = Category.objects.all().order_by('category')
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
 
 	if request.method == 'POST':
 		titulo = request.POST.get("titulo")
@@ -103,12 +103,86 @@ def homepage(request):
 	resultados = paginator.get_page(page)
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
 
-	return render(request,'homepage.html',{'articles':resultados,'cats':cats})
+	in_progress = Consumo.objects.filter(fec_fin__isnull=True)
+
+	return render(request,'homepage.html',{'articles':resultados,'cats':cats,'in_progress':in_progress})
+
+
+def categoria(request,c):
+	page = request.GET.get('page', 1)
+	this_cat = Category.objects.get(pk=int(c))
+	articles = Item.objects.filter(tipo__id=int(c)).order_by('-fecha_creacion')
+	paginator = Paginator(articles, 12)
+	resultados = paginator.get_page(page)
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+
+	return render(request,'category.html',{'this_cat':this_cat,'articles':resultados,'cats':cats})
 
 
 def item(request,i):
 	this_item = Item.objects.get(pk=int(i))
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	ncon = Consumo.objects.filter(item = this_item, fec_fin__isnull=True).count()
+	if ncon > 0:
+		con_in_prog = Consumo.objects.filter(item = this_item, fec_fin__isnull=True).latest('id')
+	else:
+		con_in_prog = None
 
-	return render(request,'item.html',{'this_item':this_item,'cats':cats})
+	if request.method == 'POST':
+		con_in_prog.fec_fin = request.POST.get("fec_fin")
+		con_in_prog.save()
+
+	return render(request,'item.html',{'this_item':this_item,'cats':cats,'cons':con_in_prog})
+
+def startConsumo(request,i):
+	this_item = Item.objects.get(pk=int(i))
+
+	if this_item.tipo.category in ['book','light novel volume','manga volume','comic book']:
+		formatos = ['printed','kindle','audiobook']
+		units = ['paginas','minutos','location']
+
+	if this_item.tipo.category in ['movie','anime','tv series']:
+		formatos = ['streaming','download','theater']
+		units = ['minutes','episodes']
+
+
+	if request.method == 'POST':
+		fec_ini = request.POST.get("fec_ini")
+		fec_fin = request.POST.get("fec_fin","no")
+		formato = request.POST.get("formato")
+		unidades = request.POST.get("unidades")
+		cantidad = request.POST.get("cantidad")
+		multiplicador = request.POST.get("multiplicador")
+
+		if len(fec_fin)<10:
+			newC = Consumo.objects.create(item=this_item,
+				fec_ini=fec_ini,
+				formato=formato,
+				unidades = unidades,
+				cantidad=int(cantidad),
+				multiplicador=multiplicador,
+				consumo=0)
+			newC.save()
+		else:
+			newC = Consumo.objects.create(item=this_item,
+				fec_ini=fec_ini,
+				fec_fin = fec_fin,
+				formato=formato,
+				unidades = unidades,
+				cantidad=int(cantidad),
+				multiplicador=multiplicador,
+				consumo=cantidad)
+			newC.save()
+
+			this_item.consumido = True
+			this_item.save()
+
+			this_item.fecha_creacion = fec_fin
+			this_item.save()
+			this_item.fecha_edicion = fec_fin
+			this_item.save()
+
+
+	return render(request,'start_consumo.html',{'this_item':this_item,'formatos':formatos,'units':units})
+
 
