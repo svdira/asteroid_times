@@ -105,3 +105,10 @@ def homepage(request):
 
 	return render(request,'homepage.html',{'articles':resultados,'cats':cats})
 
+
+def item(request,i):
+	this_item = Item.objects.get(pk=int(i))
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+
+	return render(request,'item.html',{'this_item':this_item,'cats':cats})
+

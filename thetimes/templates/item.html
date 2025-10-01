@@ -1,0 +1,30 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}The Times | Home {% endblock %}
+
+{% block izquierda %}
+
+      <h2>{{this_item.titulo}} <a href="{% url 'editItem' this_item.id %}" style="text-decoration:none; color:grey;">&#x1F4DD;</a></h2>
+      <p><span class="detalles">{{this_item.tipo.category|capfirst}} | {{this_item.fecha_creacion|date:"M j, Y"}} </span></p>
+      {{this_item.mdOutput|safe}}
+      <div style="clear:both;"></div>
+      <hr style="margin-bottom: 2em; margin-top: 1em;">
+
+
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="#" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+  
+</ul>
+{% endblock %}

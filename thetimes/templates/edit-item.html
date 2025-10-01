@@ -264,7 +264,7 @@
 <body style="padding: 1.5em;">
 
 <div style="width:48%; float:left;">
-  <h2>{{this_item.titulo}} <a href="{% url 'homepage' %}" style="text-decoration:none;">&lt;-</a></h2>
+  <h2>{{this_item.titulo}} <a href="{% url 'item' this_item.id %}" style="text-decoration:none;">&lt;-</a></h2>
   <br>
   <form method="POST">
     {% csrf_token %}
