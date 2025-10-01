@@ -1,0 +1,45 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}The Times | Home {% endblock %}
+
+{% block izquierda %}
+  {% if articles %}
+    {% for a in articles %}
+      <h2>{{a.titulo}}</h2>
+      <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}} </span></p>
+      {{a.headtext|safe}}
+      <p><a href="#" style="text-decoration: none; color:#007bff; font-family: Arial,sans-serif;">Read &#128220;</a></p>
+      <div style="clear:both;"></div>
+      <hr style="margin-bottom: 2em; margin-top: 1em;">
+    {% endfor %}
+  {% endif %}
+
+<ul class="pagination">
+
+   {% if articles.has_previous %}
+        <li><a href="?page={{ articles.previous_page_number }}">Previous</a></li>
+    {% endif %}
+
+    <li><a href="#">Page {{ articles.number }} of {{ articles.paginator.num_pages }}</a> </li>
+
+    {% if articles.has_next %}
+        <li><a href="?page={{ articles.next_page_number }}">Next</a></li>
+    {% endif %}
+
+</ul>
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="#" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+  
+</ul>
+{% endblock %}
