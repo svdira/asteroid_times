@@ -23,6 +23,42 @@
       justify-content: center;
     }
 
+      .container {
+      display: flex;
+      width:100%;
+      justify-content: space-between;
+      gap: 4%;
+      padding: 1.5em;
+      flex-wrap: wrap;
+    }
+
+    .left-panel,
+    .right-panel {
+      width: 48%;
+    }
+
+    .responsive-textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.8em;
+  font-size: 1.1em;
+  line-height: 1.5em;
+  font-family: 'Calibri','Arial', sans-serif;
+  height: 80vh;
+}
+
+
+    /* Mobile responsiveness */
+    @media screen and (max-width: 768px) {
+      .left-panel,
+      .right-panel {
+        width: 100%;
+        margin-left: 0;
+        float: none;
+      }
+    }
+
     .contenedor {
       width: 100%;
       padding: 1.0em 0em 1.0em 0em;
@@ -235,54 +271,38 @@
     }
 
 
-    @media (min-width: 900px) {
-      .contenedor {
-        width: 70%;
-        padding:20px;
-      }
-      .contenido {
-        display: flex;
-        gap: 20px;
-      }
-      .caja.izquierda {
-        flex: 2; /* 2/3 */
-      }
-      .caja.derecha {
-        flex: 1; /* 1/3 */
-      }
 
-      p {
-        font-family:  "Claris","Georgia", serif;
-        line-height: 1.6;
-        margin-bottom: 14px;
-        font-size: 1.2em;
-        text-indent:2.0em;
-        }
-    }
+
+
+
   </style>
 </head>
 <body style="padding: 1.5em;">
 
-<div style="width:48%; float:left;">
+<div class="container">
+
+<div class="left-panel">
   <h2>{{this_item.titulo}} <a href="{% url 'item' this_item.id %}" style="text-decoration:none;">&lt;-</a></h2>
   <br>
   <form method="POST">
     {% csrf_token %}
-    <textarea name="contenido" style="width:100%; padding: 0.8em; font-size: 1.1em; line-height: 1.5em; font-family: 'Claris','Times New Roman', serif; height: 80vh; ">{{this_item.contenido}}</textarea>
-  <br><input type="submit" value="Save Changes">
-  <input type="hidden" name="formulario" value="1">
+     <input type="hidden" name="formulario" value="1">
+    <textarea name="contenido" class="responsive-textarea">{{this_item.contenido}}</textarea>
+  <br><input type="submit" name="guardar" value="Save">&nbsp;<input type="submit" name="guardar" value="Save and View">
+
+
   </form>
-  
+
 
 </div>
 
-<div style="width:47%; margin-left:4%; float:left;">
+<div class="right-panel">
   <h4>Item Relations</h4>
 
   {% if items %}
   <span style="color: blue;">
     {% for i in items %}
-      {{i.rel_name}}: {{i.item.titulo}} | 
+      {{i.rel_name}}: {{i.item.titulo}} |
     {% endfor %}
   </span><br><br>
   {% endif %}
@@ -316,7 +336,7 @@
   {% if pics %}
   <span style="color: blue;">
     {% for p in pics %}
-      {{p.tipo}} | 
+      {{p.tipo}} |
     {% endfor %}
   </span><br><br>
   {% endif %}
@@ -334,7 +354,7 @@
   {% if fechas %}
   <span style="color: blue;">
     {% for p in fechas %}
-      {{p.att_name}}: {{p.att_value}} | 
+      {{p.att_name}}: {{p.att_value}} |
     {% endfor %}
   </span><br><br>
   {% endif %}
@@ -349,7 +369,7 @@
   {% if ints %}
   <span style="color: blue;">
     {% for p in ints %}
-      {{p.att_name}}: {{p.att_value}} | 
+      {{p.att_name}}: {{p.att_value}} |
     {% endfor %}
   </span><br><br>
   {% endif %}
@@ -362,7 +382,7 @@
   {% if texts %}
   <span style="color: blue;">
     {% for p in texts %}
-      {{p.att_name}}: {{p.att_value}} | 
+      {{p.att_name}}: {{p.att_value}} |
     {% endfor %}
   </span><br><br>
   {% endif %}
@@ -372,6 +392,8 @@
   </form>
 
 
+
+</div>
 
 </div>
 

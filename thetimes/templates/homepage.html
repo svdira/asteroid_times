@@ -4,7 +4,7 @@
 {% block titulo %}The Times | Home {% endblock %}
 
 {% block izquierda %}
-  
+
   {% if in_progress %}
   <h2>In Progress:</h2>
   <br>
@@ -19,13 +19,12 @@
 
   {% if articles %}
     {% for a in articles %}
-      <h2>{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</h2>
+      <h2><a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
       <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}} </span></p>
-      
+
       {% if a.credit_links %}<p>By {{a.credit_links|safe}}</p>{% endif %}
 
       {{a.headtext|safe}}
-      <p><a href="{% url 'item' a.id %}" style="text-decoration: none; color:#007bff; font-family: Arial,sans-serif;">Read &#128220;</a></p>
       <div style="clear:both;"></div>
       <hr style="margin-bottom: 2em; margin-top: 1em;">
     {% endfor %}
@@ -56,6 +55,6 @@
         <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
       {% endif %}
     {% endfor %}
-  
+
 </ul>
 {% endblock %}

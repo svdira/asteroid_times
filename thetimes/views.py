@@ -48,6 +48,8 @@ def editItem(request,i):
 			this_item.contenido = request.POST.get("contenido")
 			this_item.fecha_edicion = datetime.now()
 			this_item.save()
+			if request.POST.get("guardar") == "Save and View":
+			    return redirect(f"/item/{this_item.id}")
 		if request.POST.get("formulario") == '2':
 			kw = request.POST.get('keywords')
 			if len(kw)>4:
@@ -137,11 +139,11 @@ def item(request,i):
 def startConsumo(request,i):
 	this_item = Item.objects.get(pk=int(i))
 
-	if this_item.tipo.category in ['book','light novel volume','manga volume','comic book']:
+	if this_item.tipo.category.lower() in ['book','bunko','manga volume','comic book']:
 		formatos = ['printed','kindle','audiobook']
 		units = ['paginas','minutos','location']
 
-	if this_item.tipo.category in ['movie','anime','tv series']:
+	if this_item.tipo.category.lower() in ['movie','anime','tv series','season']:
 		formatos = ['streaming','download','theater']
 		units = ['minutes','episodes']
 
@@ -181,8 +183,25 @@ def startConsumo(request,i):
 			this_item.save()
 			this_item.fecha_edicion = fec_fin
 			this_item.save()
+		return redirect(f"/item/{this_item.id}")
 
 
 	return render(request,'start_consumo.html',{'this_item':this_item,'formatos':formatos,'units':units})
+
+
+def bookHistory(request):
+	books = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).order_by('-fec_fin')
+	rbooks = len(books)
+	qbooks = Item.objects.filter(tipo__category='Book',consumo__item__isnull=True).count()
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	return render(request,'read-history.html',{'books':books,'rbooks':rbooks,'qbooks':qbooks,'cats':cats})
+
+def bookQueue(request):
+	books = Item.objects.filter(tipo__category='Book',consumo__item__isnull=True).order_by('titulo')
+	qbooks = len(books)
+	rbooks =  Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).count()
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	in_progress = Consumo.objects.filter(item__tipo__category='Book', fec_fin__isnull=True)
+	return render(request,'read-queue.html',{'now_reading':in_progress,'books':books,'rbooks':rbooks,'qbooks':qbooks,'cats':cats})
 
 

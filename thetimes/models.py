@@ -61,7 +61,7 @@ class Item(models.Model):
     @property
     def credit_links(self):
 
-        if self.tipo.category == 'book':
+        if self.tipo.category.lower() == 'book':
             ncreds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym']).count()
             if ncreds > 0:
                 creds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym'])
@@ -86,16 +86,27 @@ class Item(models.Model):
     @property
     def periodo(self):
         this_v = None
-        if self.tipo.category == 'book':
+        pubyear = None
+        if self.tipo.category.lower() in ['book','bunko']:
             npubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').count()
             if npubyear > 0:
                 pubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').latest('id')
                 this_v = f"({pubyear.att_value})"
-        if self.tipo.category == 'movie':
+        if self.tipo.category.lower() in ['movie','season','tv series','anime']:
             npubyear = AttrInteger.objects.filter(item=self,att_name='premiere').count()
+            nfin = AttrInteger.objects.filter(item=self,att_name='finale').count()
             if npubyear > 0:
                 pubyear = AttrInteger.objects.filter(item=self,att_name='premiere').latest('id')
+            if nfin > 0:
+                finale = AttrInteger.objects.filter(item=self,att_name='finale').latest('id')
+
+            if nfin == 0 and npubyear > 0:
                 this_v = f"({pubyear.att_value})"
+            elif nfin > 0 and npubyear > 0 and finale == pubyear:
+                this_v = f"({pubyear.att_value})"
+            elif nfin > 0 and npubyear > 0 and finale != pubyear:
+                this_v = f"({pubyear.att_value} - {finale.att_value})"
+
 
         return this_v
 
@@ -112,7 +123,7 @@ class Item(models.Model):
 
     @property
     def aplica_consumo(self):
-        if self.tipo.category in ['book','movie','light novel volume','tv series','anime']:
+        if self.tipo.category.lower() in ['book','movie','bunko','tv series','anime','season']:
             return True
         else:
             return None
@@ -178,4 +189,4 @@ class AttrText(models.Model):
 
 
 
-    
+

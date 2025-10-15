@@ -1,0 +1,34 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}The Times | Home {% endblock %}
+
+{% block izquierda %}
+
+  <h2 style="color:blue;"><a href="{% url 'bookHistory' %}" style="text-decoration:none; color:#007bff; ">Book History ({{rbooks}})</a> | <a href="{% url 'bookQueue' %}" style="text-decoration:none; color:grey; ">Book Queue ({{qbooks}})</a></h2>
+  <br>
+  <ul class="styled-list">
+
+  {% for b in books %}
+    <li>
+      <span class="main-item"><a href="{% url 'item' b.item.id %}" style="text-decoration:none; color:black;">{{b.item.titulo}} {{b.item.periodo}}</a></span>
+      <small class="sub-item"> {{b.fec_fin}} | {{b.item.credit_links|safe}}</small>
+    </li>
+  {% endfor %}
+  </ul>
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+  
+</ul>
+{% endblock %}

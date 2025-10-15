@@ -21,10 +21,10 @@
   </select>
   <br><br>
   <label>Contenido:</label><br>
-  <textarea name="contenido" rows='8' style="width:100%; padding: 0.8em; font-size: 1.1em; line-height: 1.5em; font-family: 'Claris','Times New Roman', serif;"></textarea>
+  <textarea name="contenido" rows='8' style="width:95%; padding: 0.8em; font-size: 1.1em; line-height: 1.5em; font-family: 'Claris','Times New Roman', serif;"></textarea>
   <br>
   <input type="submit" value="Add Item">
-  
+
 
 </form>
 
@@ -40,7 +40,7 @@
         <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
       {% endif %}
     {% endfor %}
-  
+
 </ul>
 
 

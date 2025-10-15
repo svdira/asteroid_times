@@ -8,10 +8,9 @@
   <hr>
   {% if articles %}
     {% for a in articles %}
-      <h2>{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</h2>
+      <h2><a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
       <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}} </span></p>
       {{a.headtext|safe}}
-      <p><a href="{% url 'item' a.id %}" style="text-decoration: none; color:#007bff; font-family: Arial,sans-serif;">Read &#128220;</a></p>
       <div style="clear:both;"></div>
       <hr style="margin-bottom: 2em; margin-top: 1em;">
     {% endfor %}
