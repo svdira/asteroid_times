@@ -197,6 +197,9 @@ def bookHistory(request):
 	books = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).order_by('-fec_fin')
 	rbooks = len(books)
 	qbooks = Item.objects.filter(tipo__category='Book',consumo__item__isnull=True).count()
+	in_progress = Consumo.objects.filter(item__tipo__category='Book', fec_fin__isnull=True)
+
+	qbooks = qbooks + len(in_progress)
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
 	return render(request,'read-history.html',{'books':books,'rbooks':rbooks,'qbooks':qbooks,'cats':cats})
 
@@ -206,6 +209,7 @@ def bookQueue(request):
 	rbooks =  Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).count()
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
 	in_progress = Consumo.objects.filter(item__tipo__category='Book', fec_fin__isnull=True)
+	qbooks = qbooks + len(in_progress)
 	return render(request,'read-queue.html',{'now_reading':in_progress,'books':books,'rbooks':rbooks,'qbooks':qbooks,'cats':cats})
 
 def relatedItems(request,item):
