@@ -128,6 +128,10 @@ class Item(models.Model):
         else:
             return None
 
+    @property
+    def nrelated(self):
+        conteo = AttrItem.objects.filter(item=self).count()
+        return conteo
 
     def __str__(self):
         return self.titulo

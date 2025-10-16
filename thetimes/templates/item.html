@@ -1,12 +1,12 @@
 {% extends 'base_times.html' %}
 {% load static %}
 
-{% block titulo %}The Times | Home {% endblock %}
+{% block titulo %}{{this_item.titulo}}{% if this_item.periodo %}&nbsp;{{this_item.periodo}}{% endif %} | The Times{% endblock %}
 
 {% block izquierda %}
 
       <h2>{% if this_item.consumido%}&#9989;&nbsp;{%endif%}{{this_item.titulo}}{% if this_item.periodo %}&nbsp;{{this_item.periodo}}{% endif %}<a href="{% url 'editItem' this_item.id %}" style="text-decoration:none; color:grey;">&#x1F4DD;</a></h2>
-      <p><span class="detalles">{{this_item.tipo.category|capfirst}} | {{this_item.fecha_creacion|date:"M j, Y"}}{% if this_item.aplica_consumo %} | <a href="{% url 'startConsumo' this_item.id %}" style="text-decoration:none; color:grey;">Start</a>{% endif %}</span></p>
+      <p><span class="detalles">{{this_item.tipo.category|capfirst}} | {{this_item.fecha_creacion|date:"M j, Y"}}{% if this_item.aplica_consumo %} | <a href="{% url 'startConsumo' this_item.id %}" style="text-decoration:none; color:grey;">Start</a>{% endif %}{% if conteo_r > 0 %} | <a href="{% url 'relatedItems' this_item.id %}" style="text-decoration:none; color:grey;">Related ({{conteo_r}})</a>{% endif %}</span></p>
 
        {% if cons %}<form method='POST' style='font-size: 1.2em; text-indent:1.4em;  font-family:  "Claris","Georgia", serif;'>{% csrf_token %}<label>FDate:</label>&nbsp;<input type="text" name="fec_fin" style="width:6em;">&nbsp;<input type="submit" value="Finish"></form>{% endif %}
 

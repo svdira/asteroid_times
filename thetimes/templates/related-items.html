@@ -1,0 +1,40 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}{{this_item.titulo}}{% if this_item.periodo %}&nbsp;{{this_item.periodo}}{% endif %} | Related Items{% endblock %}
+
+{% block izquierda %}
+
+  <h2><a href="{% url 'item' this_item.id %}" style="text-decoration:none; color:#007bff; ">{{this_item.titulo}}{% if this_item.periodo %}&nbsp;{{this_item.periodo}}{% endif %}</a></h2>
+
+
+  {% if tipos %}
+    {% for t in tipos %}
+      <h3>{{t.cat}}</h3>
+      <ul class="styled-list">
+         {% for i in t.items %}
+          <li>
+            <span class="main-item"><a href="{% url 'item' i.child.id %}" style="text-decoration:none; color:black;">{% if i.child.consumido%}&#9989;&nbsp;{%endif%}{{i.child.titulo}}{% if i.child.periodo %}&nbsp;{{i.child.periodo}}{% endif %}</a></span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  {% endif %}
+  
+  
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+  
+</ul>
+{% endblock %}

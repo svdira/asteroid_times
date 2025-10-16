@@ -13,4 +13,5 @@ urlpatterns = [
 	path('start-consumo/<i>', views.startConsumo, name='startConsumo'),
 	path('book-history/', views.bookHistory, name='bookHistory'),
 	path('book-queue/', views.bookQueue, name='bookQueue'),
+	path('related-items/<item>', views.relatedItems, name='relatedItems'),
 	]

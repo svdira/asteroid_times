@@ -104,8 +104,10 @@ def homepage(request):
 	paginator = Paginator(articles, 12)
 	resultados = paginator.get_page(page)
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
-
-	in_progress = Consumo.objects.filter(fec_fin__isnull=True)
+	if page == 1:
+	    in_progress = Consumo.objects.filter(fec_fin__isnull=True)
+	else:
+	    in_progress = None
 
 	return render(request,'homepage.html',{'articles':resultados,'cats':cats,'in_progress':in_progress})
 
@@ -130,11 +132,13 @@ def item(request,i):
 	else:
 		con_in_prog = None
 
+	conteo_rel = AttrItem.objects.filter(item=this_item).count()
+
 	if request.method == 'POST':
 		con_in_prog.fec_fin = request.POST.get("fec_fin")
 		con_in_prog.save()
 
-	return render(request,'item.html',{'this_item':this_item,'cats':cats,'cons':con_in_prog})
+	return render(request,'item.html',{'this_item':this_item,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel})
 
 def startConsumo(request,i):
 	this_item = Item.objects.get(pk=int(i))
@@ -203,5 +207,21 @@ def bookQueue(request):
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
 	in_progress = Consumo.objects.filter(item__tipo__category='Book', fec_fin__isnull=True)
 	return render(request,'read-queue.html',{'now_reading':in_progress,'books':books,'rbooks':rbooks,'qbooks':qbooks,'cats':cats})
+
+def relatedItems(request,item):
+	this_item = Item.objects.get(pk=int(item))
+	
+	tipos = []
+	categories = AttrItem.objects.filter(item=this_item).values_list('child__tipo__category', flat=True).distinct()
+	for cat in categories:
+		items_cat = AttrItem.objects.filter(item=this_item, child__tipo__category=cat)
+		tipos.append({'cat':cat,'items':items_cat})
+
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+
+	return render(request,'related-items.html',{'this_item':this_item,'tipos':tipos,'cats':cats})
+
+
+
 
 
