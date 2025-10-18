@@ -137,6 +137,9 @@ def item(request,i):
 	if request.method == 'POST':
 		con_in_prog.fec_fin = request.POST.get("fec_fin")
 		con_in_prog.save()
+		this_item.fecha_creacion = request.POST.get("fec_fin")
+		this_item.consumido = True
+		this_item.save()
 
 	return render(request,'item.html',{'this_item':this_item,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel})
 
@@ -214,7 +217,7 @@ def bookQueue(request):
 
 def relatedItems(request,item):
 	this_item = Item.objects.get(pk=int(item))
-	
+
 	tipos = []
 	categories = AttrItem.objects.filter(item=this_item).values_list('child__tipo__category', flat=True).distinct()
 	for cat in categories:
@@ -224,6 +227,27 @@ def relatedItems(request,item):
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
 
 	return render(request,'related-items.html',{'this_item':this_item,'tipos':tipos,'cats':cats})
+
+def addChildItem(request, parent):
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	this_parent = Item.objects.get(pk=int(parent))
+
+	if request.method == 'POST':
+		titulo = request.POST.get("titulo")
+		relacion = request.POST.get("relacion")
+		cat_id = request.POST.get("category")
+		categoria = Category.objects.get(pk=int(cat_id))
+		contenido = request.POST.get("contenido")
+
+		newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
+		newI.save()
+
+		newRel = AttrItem.objects.create(item=this_parent,child=newI,rel_name=relacion)
+		newRel.save()
+
+		return redirect(f'/edit-item/{newI.id}')
+
+	return render(request,'add-child-item.html',{'cats':cats,'this_parent':this_parent})
 
 
 

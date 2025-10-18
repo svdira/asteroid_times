@@ -1,0 +1,49 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}Add New Item{% endblock %}
+
+{% block izquierda %}
+
+
+<h2>Add Child Item to {{this_parent.titulo}}</h2>
+
+<form method="POST">
+  {% csrf_token %}
+  <label>Title:</label><br>
+  <input type="text" name="titulo" style="width:100%; padding-top:0.5em;padding-bottom:0.5em;">
+  <br><br>
+   <label>Relation Parent to Child:</label><br>
+   <input type="text" name="relacion" style="padding-top:0.5em;padding-bottom:0.5em;"><br><br>
+  <label>Type:</label><br>
+  <select name="category" style="padding-top:0.5em;padding-bottom:0.5em;">
+    {% for c in cats %}
+      <option value="{{c.id}}">{{c.category}}</option>
+    {% endfor %}
+  </select>
+  <br><br>
+  <label>Contenido:</label><br>
+  <textarea name="contenido" rows='8' style="width:95%; padding: 0.8em; font-size: 1.1em; line-height: 1.5em; font-family: 'Calibri','Arial', sans-serif;"></textarea>
+  <br>
+  <input type="submit" value="Add Item">
+
+
+</form>
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+
+</ul>
+
+
+{% endblock %}
