@@ -320,7 +320,7 @@
 
     <!-- Fecha centrada -->
     <div class="fecha">
-      {% block cinta %} <a href="{% url 'bookHistory' %}" style="text-decoration:none; color:grey;">Books</a> | <a href="https://svtimes.pythonanywhere.com/movies/1" style="text-decoration:none; color:grey;">Movies</a> | <a href="#" style="text-decoration:none; color:grey;">Shows</a> | <a href="https://svtimes.pythonanywhere.com/" style="text-decoration:none; color:grey;">Fútbol</a> | <a href="https://svtimes.pythonanywhere.com/journal/1" style="text-decoration:none; color:grey;">Journal</a> | <a href="{% url 'addItem' %}" style="text-decoration:none; color:grey;">Add Item</a>{% endblock %}
+      {% block cinta %}<a href="{% url 'searchPage' %}" style="text-decoration:none; color:grey;">Search</a> | <a href="{% url 'bookHistory' %}" style="text-decoration:none; color:grey;">Books</a> | <a href="https://svtimes.pythonanywhere.com/movies/1" style="text-decoration:none; color:grey;">Movies</a> | <a href="https://svtimes.pythonanywhere.com/" style="text-decoration:none; color:grey;">Fútbol</a> | <a href="https://svtimes.pythonanywhere.com/journal/1" style="text-decoration:none; color:grey;">Journal</a> | <a href="{% url 'addItem' %}" style="text-decoration:none; color:grey;">Add Item</a>{% endblock %}
     </div>
 
     <div class="contenido">

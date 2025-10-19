@@ -1,0 +1,62 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}The Times | Home {% endblock %}
+
+{% block izquierda %}
+
+
+  <form method='POST'>
+    {% csrf_token %}
+    <input type="text" name="key_word"  style="width:100%; padding-top:0.5em;padding-bottom:0.5em;"><br><br>
+    <input type="submit" value="Search"  style="padding-top:0.5em;padding-bottom:0.5em;">
+  </form>
+
+
+
+   {% if rt or rc %}
+   <br>
+
+  <h2>Search Results:</h2>
+
+   <hr>
+    {% for a in rt %}
+      <h2><a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
+      <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}}{% if a.nrelated > 0 %} | <a href="{% url 'relatedItems' a.id %}" style="text-decoration:none; color:grey;">Related ({{a.nrelated}})</a>{% endif %}</span></p>
+
+      {% if a.credit_links %}<p>By {{a.credit_links|safe}}</p>{% endif %}
+
+      {{a.headtext|safe}}
+      <div style="clear:both;"></div>
+      <hr style="margin-bottom: 2em; margin-top: 1em;">
+    {% endfor %}
+  {% endif %}
+
+   {% if rc %}
+    {% for a in rc %}
+      <h2><a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
+      <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}}{% if a.nrelated > 0 %} | <a href="{% url 'relatedItems' a.id %}" style="text-decoration:none; color:grey;">Related ({{a.nrelated}})</a>{% endif %}</span></p>
+
+      {% if a.credit_links %}<p>By {{a.credit_links|safe}}</p>{% endif %}
+
+      {{a.headtext|safe}}
+      <div style="clear:both;"></div>
+      <hr style="margin-bottom: 2em; margin-top: 1em;">
+    {% endfor %}
+  {% endif %}
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+
+</ul>
+{% endblock %}

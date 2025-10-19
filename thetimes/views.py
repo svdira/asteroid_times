@@ -249,6 +249,20 @@ def addChildItem(request, parent):
 
 	return render(request,'add-child-item.html',{'cats':cats,'this_parent':this_parent})
 
+def searchPage(request):
+	results = None
+	results_2 = None
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+
+	if request.method == 'POST':
+		key_word = request.POST.get("key_word")
+		results = Item.objects.filter(titulo__contains=key_word)
+		ids =  Item.objects.filter(titulo__contains=key_word).values_list('id', flat=True)
+		ids_list = list(ids)
+		results_2 = Item.objects.filter(contenido__contains=key_word).exclude(id__in=ids_list)
+
+	return render(request,'search-page.html',{'cats':cats,'rt':results,'rc':results_2})
+
 
 
 
