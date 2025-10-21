@@ -28,8 +28,8 @@
 
   {% for b in books %}
     <li>
-      <span class="main-item"><a href="{% url 'item' b.item.id %}" style="text-decoration:none; color:black;">{{b.item.titulo}} {{b.item.periodo}}</a></span>
-      <small class="sub-item">By {{b.item.credit_links|safe}}</small>
+      <span class="main-item"><a href="{% url 'item' b.id %}" style="text-decoration:none; color:black;">{{b.titulo}} {{b.periodo}}</a></span>
+      <small class="sub-item">By {{b.credit_links|safe}}</small>
     </li>
   {% endfor %}
   </ul>
@@ -49,6 +49,6 @@
         <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
       {% endif %}
     {% endfor %}
-  
+
 </ul>
 {% endblock %}

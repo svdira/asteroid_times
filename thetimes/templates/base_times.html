@@ -311,6 +311,8 @@
         }
     }
   </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <div class="contenedor">
@@ -349,5 +351,15 @@
       </div>
     </div>
   </div>
+  <script>
+  flatpickr("#datepicker", {
+    dateFormat: "Y-m-d"
+  });
+</script>
+<script>
+  flatpickr("#datepicker2", {
+    dateFormat: "Y-m-d"
+  });
+</script>
 </body>
 </html>

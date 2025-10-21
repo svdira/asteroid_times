@@ -16,4 +16,5 @@ urlpatterns = [
 	path('book-history/', views.bookHistory, name='bookHistory'),
 	path('book-queue/', views.bookQueue, name='bookQueue'),
 	path('related-items/<item>', views.relatedItems, name='relatedItems'),
+	path('print-html/<cid>', views.printHTML, name='printHTML'),
 	]

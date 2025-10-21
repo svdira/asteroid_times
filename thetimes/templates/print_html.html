@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ this_item.titulo }} | The Asteroid B612</title>
+</head>
+<body>
+
+<br>
+<div style="width:100%; position:relative; text-align: center;">
+		<img src="/media/assets/times_logo.png" style="width: 80%;" alt="Imagen encabezado">
+</div>
+<br>
+
+<h1>{{ this_item.titulo }} {%if this_item.periodo %}{{this_item.periodo}}{% endif %}</h1>
+{{this_item.mdOutput|safe}}
+	{%if related %}
+		{% for c in related %}
+			<h2>{{c.child.titulo}} {%if c.child.periodo %}{{c.child.periodo}}{% endif %}</h2>
+			<p><i>{{c.child.fecha_creacion|date:"M d, Y"}} | {{c.child.tipo.category}}</i></p>
+			{{c.child.mdOutput|safe}}
+		{% endfor %}
+	{%endif%}
+</body>
+</html>

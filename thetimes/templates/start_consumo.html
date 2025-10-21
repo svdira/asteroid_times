@@ -12,9 +12,9 @@
       <form method="POST">
         {% csrf_token %}
         <label>Start Date:</label><br>
-        <input type="text" name="fec_ini" style="padding:0.4em;"><br><br>
+        <input type="text" name="fec_ini" id="datepicker" placeholder="Select date" style="padding:0.4em;"><br><br>
         <label>Finish Date:</label><br>
-        <input type="text" name="fec_fin" style="padding:0.4em;"><br><br>
+        <input type="text" name="fec_fin"  id="datepicker2" placeholder="Select date" style="padding:0.4em;"><br><br>
         <label>Format:</label><br>
         <select name="formato" style="padding:0.4em;">
           {% for f in formatos %}

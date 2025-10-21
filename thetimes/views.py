@@ -197,14 +197,25 @@ def startConsumo(request,i):
 
 
 def bookHistory(request):
-	books = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).order_by('-fec_fin')
+	get_y = request.GET.get('y', 1)
+	max_year = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).order_by('-fec_fin').first()
+
+	this_y = max_year.fec_fin.year if int(get_y) == 1 else int(get_y)	
+
+	books = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False, fec_fin__year=this_y).order_by('-fec_fin')
 	rbooks = len(books)
 	qbooks = Item.objects.filter(tipo__category='Book',consumo__item__isnull=True).count()
 	in_progress = Consumo.objects.filter(item__tipo__category='Book', fec_fin__isnull=True)
 
+	nr_books = Item.objects.filter(tipo__category='Book',consumido	= True).count()
+
+
+	anhos = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).values('fec_fin__year').annotate(qbooks=Count('id')).order_by('-fec_fin__year')
+	
+
 	qbooks = qbooks + len(in_progress)
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
-	return render(request,'read-history.html',{'books':books,'rbooks':rbooks,'qbooks':qbooks,'cats':cats})
+	return render(request,'read-history.html',{'books':books,'nr_books':nr_books,'this_y':this_y,'anhos':anhos,'rbooks':rbooks,'qbooks':qbooks,'cats':cats,'anhos':anhos})
 
 def bookQueue(request):
 	books = Item.objects.filter(tipo__category='Book',consumo__item__isnull=True).order_by('titulo')
@@ -263,7 +274,10 @@ def searchPage(request):
 
 	return render(request,'search-page.html',{'cats':cats,'rt':results,'rc':results_2})
 
+def printHTML(request, cid):
+	this_item = Item.objects.get(pk=int(cid))
+	related = AttrItem.objects.filter(item=this_item).order_by('id')
 
-
+	return render(request,'print_html.html',{'this_item':this_item, 'related':related })
 
 

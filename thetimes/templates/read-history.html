@@ -5,7 +5,7 @@
 
 {% block izquierda %}
 
-  <h2 style="color:blue;"><a href="{% url 'bookHistory' %}" style="text-decoration:none; color:#007bff; ">Book History ({{rbooks}})</a> | <a href="{% url 'bookQueue' %}" style="text-decoration:none; color:grey; ">Book Queue ({{qbooks}})</a></h2>
+  <h2 style="color:blue;"><a href="{% url 'bookHistory' %}" style="text-decoration:none; color:#007bff; ">A Year of Books {{this_y}} ({{rbooks}})</a> | <a href="{% url 'bookQueue' %}" style="text-decoration:none; color:grey; ">Book Queue ({{qbooks}})</a></h2>
   <br>
   <ul class="styled-list">
 
@@ -22,6 +22,19 @@
 
 
 {% block derecha %}
+
+<h2>Book Years ({{nr_books}}):</h2>
+
+<ul class="list-group">
+    {% for c in anhos %}
+      
+        <li class="list-group-item"><a href="{% url 'bookHistory' %}?y={{c.fec_fin__year}}" style="text-decoration:none; color:black;">{{c.fec_fin__year}}</a> <span class="badge badge-pill">{{c.qbooks}}</span></li>
+      
+    {% endfor %}
+  
+</ul>
+<br>
+<h2>Categories:</h2>
 
 <ul class="list-group">
     {% for c in cats %}
