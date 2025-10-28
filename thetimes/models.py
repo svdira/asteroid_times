@@ -190,6 +190,138 @@ class AttrText(models.Model):
     def __str__(self):
         return self.att_name + ' @ ' + self.item.titulo
 
+class Equipo(models.Model):
+    nombre = models.CharField(max_length=250)
+    nombre_corto = models.CharField(max_length=15)
+    pais = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.nombre
+
+class Jugador(models.Model):
+    nombre = models.CharField(max_length=250)
+    info = models.TextField()
+    pais = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.nombre
+
+class Contrato(models.Model):
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE)
+    fec_ini = models.DateField(null=True, blank=True)
+    fec_fin = models.DateField(null=True, blank=True)
+    posicion = models.CharField(max_length=200)
+    n_posicion = models.IntegerField(default=0)
+    dorsal = models.IntegerField()
+    last_edited = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.jugador.nombre + ' @ ' + self.equipo.nombre
+
+class Torneo(models.Model):
+    nombre = models.CharField(max_length=256)
+    region = models.CharField(max_length=200)
+
+    @property
+    def npartidos(self):
+        con = Partido.objects.filter(torneo=self).count()
+        return con
+
+    def __str__(self):
+        return self.nombre
+
+class Partido(models.Model):
+    fecha = models.DateField()
+    torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE)
+    local = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='local')
+    visita = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='visita')
+    fase = models.CharField(max_length=200,default='MD')  
+    goles_local = models.IntegerField()
+    goles_visita = models.IntegerField()    
+    rondap_local = models.IntegerField()
+    rondap_visita = models.IntegerField()
+    terminado = models.BooleanField()
+
+
+    def __str__(self):
+        return self.local.nombre + ' v ' + self.visita.nombre + ' @ ' + self.torneo.nombre
+
+    
+    @property
+    def gl(self):
+        return Gol.objects.filter(partido=self, gol_local=True).count()
+
+    @property
+    def gv(self):
+        return Gol.objects.filter(partido=self, gol_local=False).count()
+
+    @property
+    def headline(self):
+        if self.terminado == False:
+            return self.local.nombre + ' v ' + self.visita.nombre + ' @ ' + self.torneo.nombre
+        else:
+            if (self.rondap_local +  self.rondap_visita) > 0:
+                m = f"{self.goles_local}({self.rondap_local}) - ({self.goles_visita}){self.goles_visita}"
+            else:
+                m = f"{self.goles_local} - {self.goles_visita}"
+
+            return self.local.nombre + f' {m} ' + self.visita.nombre + ' @ ' + self.torneo.nombre
+
+    @property
+    def marcador(self):
+        if self.terminado == False:
+            m = " vs "
+        elif (self.rondap_local +  self.rondap_visita) > 0:
+            m = f"{self.goles_local}({self.rondap_local}) - ({self.goles_visita}){self.goles_visita}"
+        else:
+            m = f"{self.goles_local} - {self.goles_visita}"
+
+        return m
+
+class Gol(models.Model):
+    partido = models.ForeignKey(Partido, on_delete=models.CASCADE)
+    contrato = models.ForeignKey(Contrato,on_delete=models.CASCADE)
+    minuto = models.IntegerField()
+    adicional = models.IntegerField()
+    penalty = models.BooleanField()
+    autogol = models.BooleanField()
+    gol_local = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.contrato.jugador.nombre + 'on partido: ' + str(self.partido.id) + ' @ ' + str(self.minuto)
+ 
+
+class Alineacion(models.Model):
+    partido = models.ForeignKey(Partido, on_delete=models.CASCADE)
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE) 
+    contrato = models.ForeignKey(Contrato,on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=75)
+
+    def __str__(self):
+        return self.contrato.jugador.nombre + 'on partido: ' + str(self.partido.id)
+
+
+class RelTorneoEquipo(models.Model):
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+    torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.equipo.nombre + ' @ ' + self.torneo.nombre
+
+class JournalEntry(models.Model):
+    fecha = models.DateField()
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.item.titulo
+
+
+
+
+
+
+
+
 
 
 

@@ -1,0 +1,74 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}SOCCER{% endblock %}
+
+{% block izquierda %}
+
+
+
+
+
+<p><span class="detalles"><a href="{% url 'equipo' 1 %}" style="text-decoration:none; color:grey;">Barcelona</a> | <a href="{% url 'equipo' 2 %}" style="text-decoration:none; color:grey;">Liverpool</a> | <a href="{% url 'equipo' 3 %}" style="text-decoration:none; color:grey;">Roma</a></span></p>
+
+
+{% if tc == '0' %}
+<h2>Coming Matches | <a href="{% url 'futbol' 1 %}">Finished</a></h2><br>
+  {% if cm %}
+    {% for m in cm %}
+      <table>
+        <tr>
+          <th colspan="6" style="text-align: left;">{{m.liga}}</th>
+        </tr>
+        {% for i in m.partidos %}
+        <tr>
+          <td>{{i.fecha|date:"m/d"}}</td>
+          <td>{{i.local.nombre}}</td>
+          <td><a href="{% url 'partido' i.id %}">vs</a></td>
+          <td>{{i.visita.nombre}}</td>
+          <td>{{i.fase}}</td>
+        </tr>
+        {% endfor %}
+
+      </table>   <br> 
+    {% endfor %}
+  {% endif %}
+
+{% else %}
+
+  <table>
+    <tr><th colspan="6">Last Matches</th></tr>
+  {% for p in partidos %}
+  <tr>
+    <td>{{p.fecha|date:"m/d"}}</td>
+    <td>{{p.local.nombre}}</td>
+    <td style="text-align:center;"><a href="{% url 'partido' p.id %}" style="color:blue; text-decoration: none;">{{p.marcador}}</a></td>
+    <td>{{p.visita.nombre}}</td>
+    <td><a href="{% url 'liga' p.torneo.id %}" style="color:blue; text-decoration: none;">{{p.torneo.nombre}}</a></td>
+    <td>{{p.fase}}</td>
+  </tr>
+  {% endfor %}
+  </table>
+
+{% endif %}
+
+{% endblock %}
+
+
+{% block derecha %}
+<h3>Leagues</h3>
+
+<ul class="list-group">
+    {% for c in ligas %}
+    
+
+        <li class="list-group-item"><a href="{% url 'liga' c.id %}" style="text-decoration:none; color:black;">{{c.nombre}}</a> <span class="badge badge-pill">{{c.npartidos}}</span></li>
+      
+    {% endfor %}
+
+</ul>
+
+
+
+
+{% endblock %}

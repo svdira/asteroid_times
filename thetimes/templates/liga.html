@@ -1,0 +1,74 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}{{this_liga.nombre}}'s Page{% endblock %}
+
+{% block izquierda %}
+
+
+<h2>{{this_liga.nombre}} Main Page</h2>
+<p><span class="detalles"><a href="{% url 'addMatch' this_liga.id %}"  style="text-decoration:none; color:grey;">Add Match</a> | <a href="{% url 'addTeams' this_liga.id %}"  style="text-decoration:none; color:grey;">Add Teams</a></span></p>
+
+{% if pp %}
+  
+  <table>
+  <tr><th colspan="5" style="text-align: left;">Coming Matches<th></tr>
+  {% for p in pp %}
+  <tr>
+    <td>{{p.fecha|date:"m/d"}}</td>
+    <td>{{p.local.nombre}}</td>
+    <td><a href="{% url 'partido' p.id %}">vs</a></td>
+    <td>{{p.visita.nombre}}</td>
+    <td>{{p.fase}}</td>
+  </tr>
+  {% endfor %}
+  </table>
+{% endif %}
+
+
+
+
+
+{% if pt %}
+<br><br>
+  <table>
+  <tr><th colspan="5" style="text-align: left;">Finished Matches<th></tr>
+  
+  {% for p in pt %}
+  <tr>
+    <td>{{p.fecha|date:"m/d"}}</td>
+    <td>{{p.local.nombre}}</td>
+    <td style="text-align:center;"><a href="{% url 'partido' p.id %}" style="color:blue; text-decoration: none;">{{p.marcador}}</a></td>
+    <td>{{p.visita.nombre}}</td>
+    <td>{{p.fase}}</td>
+  </tr>
+  {% endfor %}
+  </table>
+{% endif %}
+
+
+
+
+
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<h3>Leagues</h3>
+
+<ul class="list-group">
+    {% for c in ligas %}
+    
+
+        <li class="list-group-item"><a href="{% url 'liga' c.id %}" style="text-decoration:none; color:black;">{{c.nombre}}</a> <span class="badge badge-pill">{{c.npartidos}}</span></li>
+      
+    {% endfor %}
+
+</ul>
+
+
+
+{% endblock %}

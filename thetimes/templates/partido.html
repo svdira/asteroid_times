@@ -1,0 +1,115 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}{{this_partido.headline}}{% endblock %}
+
+{% block izquierda %}
+
+
+<h2>{{this_partido.headline}}</h2>
+<p><span class="detalles">LineUps: <a href="{% url 'alineacion' this_partido.id this_partido.local.id %}"  style="text-decoration:none; color:grey;">{{this_partido.local.nombre}}</a> | <a href="{% url 'alineacion' this_partido.id this_partido.visita.id %}"  style="text-decoration:none; color:grey;">{{this_partido.visita.nombre}} </a></span></p>
+
+{% if this_partido.terminado == False %}
+<form method="POST">
+  {% csrf_token %}
+  <table>
+    <tr>
+      <td>{{this_partido.local.nombre}}</td>
+      <td><input type="text" name="goles_local" style="width:3em; text-align: center; padding-top:0.5em;padding-bottom:0.5em;"></td>
+    </tr>
+    <tr>
+      <td>{{this_partido.visita.nombre}}</td>
+      <td><input type="text" name="goles_visita" style="width:3em; text-align: center; padding-top:0.5em;padding-bottom:0.5em;"></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align: center;"><input type="submit" value="Save"></td>
+    </tr>
+  </table>
+</form>
+{% else %}
+
+{% if goles %}
+  {% for g in goles %}
+    ({{g.contrato.equipo.nombre_corto}}) {{g.contrato.jugador.nombre}} {{g.minuto}}'{% if g.adicional > 0%}+{{g.adicional}}{%endif%}{% if g.penalty == True %} P{%endif%}<br>
+  {% endfor %}
+{% endif %}
+  
+   {% if contratos_l and this_partido.goles_local > 0 and this_partido.goles_local > this_partido.gl %}
+
+
+  <h3>Register Local Goals</h3>
+    <form method='POST' action="{% url 'regGol' %}">
+       {% csrf_token %}
+       <label><b>Player:&nbsp;</b></label>
+       <select name="contrato" style="padding-top:0.5em;padding-bottom:0.5em;">
+        {%for c in contratos_l%}
+         <option value="{{c.id}}">{{c.jugador.nombre}}</option>
+        {% endfor %}
+       </select>
+       &nbsp;<input type="text" name="goal_str" style="padding-top:0.5em;padding-bottom:0.5em;">
+       &nbsp;<input type="submit" value="save" style="padding-top:0.5em;padding-bottom:0.5em;">
+       <input type="hidden" name="tipo" value="local">
+       <input type="hidden" name="partido" value="{{this_partido.id}}">
+    </form>
+  {% endif %}
+
+  {% if contratos_v and this_partido.goles_visita > 0 and this_partido.goles_visita > this_partido.gv %}
+  <h3>Register Visit Goals</h3>
+    <form method='POST' action="{% url 'regGol' %}">
+       {% csrf_token %}
+       <label><b>Player:&nbsp;</b></label>
+       <select name="contrato" style="padding-top:0.5em;padding-bottom:0.5em;">
+        {%for c in contratos_v%}
+         <option value="{{c.id}}">{{c.jugador.nombre}}</option>
+        {% endfor %}
+       </select>
+       &nbsp;<input type="text" name="goal_str" style="padding-top:0.5em;padding-bottom:0.5em;">
+       &nbsp;<input type="submit" value="save" style="padding-top:0.5em;padding-bottom:0.5em;">
+       <input type="hidden" name="tipo" value="visita">
+       <input type="hidden" name="partido" value="{{this_partido.id}}">
+    </form>
+  {% endif %}
+{% endif %}
+
+
+{% if next_m %}
+<br><br>
+
+  <table>
+    <tr>
+      <th colspan="5" style="text-align: left;">More Matches</th>
+    </tr>
+  {% for p in next_m %}
+  <tr>
+    <td>{{p.fecha|date:"m/d"}}</td>
+    <td>{{p.local.nombre}}</td>
+    <td><a href="{% url 'partido' p.id %}">vs</a></td>
+    <td>{{p.visita.nombre}}</td>
+    <td><a href="{% url 'liga' p.torneo.id %}" style="color:blue; text-decoration: none;">{{p.torneo.nombre}}</a></td>
+    <td>{{p.fase}}</td>
+  </tr>
+  {% endfor %}
+  </table>
+{% endif %}
+
+
+
+
+
+{% endblock %}
+
+
+{% block derecha %}
+<h3>Leagues</h3>
+
+<ul class="list-group">
+    {% for c in ligas %}
+    
+
+        <li class="list-group-item"><a href="{% url 'liga' c.id %}" style="text-decoration:none; color:black;">{{c.nombre}}</a> <span class="badge badge-pill">{{c.npartidos}}</span></li>
+      
+    {% endfor %}
+
+</ul>
+
+{% endblock %}

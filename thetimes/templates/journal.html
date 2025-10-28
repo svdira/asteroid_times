@@ -1,0 +1,53 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}Add New Item{% endblock %}
+
+{% block izquierda %}
+
+
+
+
+<form method="POST">
+  {% csrf_token %}
+
+  <textarea name="contenido" rows='4' style="width:95%; padding: 0.8em; font-size: 1.1em; line-height: 1.5em; font-family: 'Calibri','Arial', sans-serif;"></textarea>
+  <br>
+  <input type="text" name="fecha" value="{% now 'Y-m-d' %}" style="padding:0.4em; width: 6em;">
+  <input type="submit" value="Add Entry" style="padding:0.4em;">
+
+
+</form>
+
+<br>
+<h2>Journal {{this_y}} {% if anhos %}{% for a in anhos%} | <a href="{% url 'journal' %}?y={{a.fecha__year}}" style="text-decoration:none; color:blue;">{{a.fecha__year}} ({{a.qbooks}})</a>{% endfor %}{% endif %}</h2>
+<hr>
+
+{% if entries %}
+    {% for a in entries %}
+      <h2><a href="{% url 'item' a.item.id %}" style="text-decoration:none; color:#007bff; ">{{a.item.titulo}}</a></h2>
+
+
+      {{a.item.headtext|safe}}
+      <div style="clear:both;"></div>
+      <hr style="margin-bottom: 2em; margin-top: 1em;">
+    {% endfor %}
+  {% endif %}
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+
+</ul>
+
+
+{% endblock %}

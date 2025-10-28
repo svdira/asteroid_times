@@ -27,7 +27,10 @@ def addItem(request):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
+		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime','tv series','season']:
+		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
+		else:
+		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
 		newI.save()
 
 		return redirect(f'/edit-item/{newI.id}')
@@ -200,7 +203,7 @@ def bookHistory(request):
 	get_y = request.GET.get('y', 1)
 	max_year = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).order_by('-fec_fin').first()
 
-	this_y = max_year.fec_fin.year if int(get_y) == 1 else int(get_y)	
+	this_y = max_year.fec_fin.year if int(get_y) == 1 else int(get_y)
 
 	books = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False, fec_fin__year=this_y).order_by('-fec_fin')
 	rbooks = len(books)
@@ -211,7 +214,7 @@ def bookHistory(request):
 
 
 	anhos = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).values('fec_fin__year').annotate(qbooks=Count('id')).order_by('-fec_fin__year')
-	
+
 
 	qbooks = qbooks + len(in_progress)
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
@@ -279,5 +282,264 @@ def printHTML(request, cid):
 	related = AttrItem.objects.filter(item=this_item).order_by('id')
 
 	return render(request,'print_html.html',{'this_item':this_item, 'related':related })
+
+
+def addContrato(request,equipo):
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	equipo = Equipo.objects.get(pk=int(equipo))
+
+	if request.method == 'POST':
+		nombre = request.POST.get("nombre")
+		pais = request.POST.get("pais")
+		info = request.POST.get("info")
+
+		fec_ini = request.POST.get("fec_ini")
+		posicion = request.POST.get("posicion")
+		dorsal = request.POST.get("dorsal")
+
+		if posicion == 'arquero':
+			n_p = 1
+		elif posicion == 'defensa':
+			n_p = 2
+		elif posicion == 'centrocampista':
+			n_p = 3
+		elif posicion == 'delantero':
+			n_p = 4
+		else:
+			n_p = 0
+		
+		
+
+		newJ = Jugador.objects.create(nombre=nombre, pais=pais, info=info)
+		newJ.save()
+		newC = Contrato.objects.create(equipo=equipo,jugador=newJ, fec_ini = fec_ini, posicion=posicion,n_posicion=n_p, dorsal=dorsal,last_edited=datetime.today().date())
+		newC.save()
+
+		return redirect(f'/equipo/{equipo.id}')
+
+	return render(request,'add-contrato.html',{'cats':cats,'this_equipo':equipo})
+
+
+def equipo(request,equipo):
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	equipo = Equipo.objects.get(pk=int(equipo))
+	ligas = Torneo.objects.all().order_by('-id')
+
+	arqueros = Contrato.objects.filter(equipo=equipo, posicion='arquero', fec_fin__isnull=True).order_by('dorsal')
+	defensas = Contrato.objects.filter(equipo=equipo, posicion='defensa', fec_fin__isnull=True).order_by('dorsal')
+	centros = Contrato.objects.filter(equipo=equipo, posicion='centrocampista', fec_fin__isnull=True).order_by('dorsal')
+	delanteros = Contrato.objects.filter(equipo=equipo, posicion='delantero', fec_fin__isnull=True).order_by('dorsal')
+	dt = Contrato.objects.filter(equipo=equipo, posicion='dt', fec_fin__isnull=True).order_by('dorsal')
+
+
+
+	return render(request,'equipo.html',{'cats':cats,'this_equipo':equipo,'arqueros':arqueros,'defensas':defensas, 'centros':centros,'delanteros':delanteros,'dt':dt,'ligas':ligas})
+
+def liga(request,liga):
+	ligas = Torneo.objects.all().order_by('-id')
+	this_liga = Torneo.objects.get(pk=int(liga))
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	pp = Partido.objects.filter(torneo=this_liga, terminado=False).order_by('fecha','id')
+	pt = Partido.objects.filter(torneo=this_liga, terminado=True).order_by('-fecha','id')
+
+	return render(request,'liga.html',{'cats':cats,'this_liga':this_liga,'pp':pp,'pt':pt,'ligas':ligas})
+
+def addMatch(request,liga):
+	this_liga = Torneo.objects.get(pk=int(liga))
+	ligas = Torneo.objects.all().order_by('-id')
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	equipos = RelTorneoEquipo.objects.filter(torneo=this_liga).order_by('equipo__nombre')
+	ult_partido = Partido.objects.latest('id')
+
+	recent_partidos = Partido.objects.all().order_by('-id')[0:16]
+
+	if request.method == 'POST':
+		local = Equipo.objects.get(pk=int(request.POST.get("local")))
+		visit = Equipo.objects.get(pk=int(request.POST.get("visit")))
+		fase = request.POST.get("fase")
+		fecha = request.POST.get("fecha")
+
+		newP = Partido.objects.create(fecha = fecha,torneo = this_liga,  local = local, visita = visit,fase =fase,  goles_local = 0,  goles_visita = 0,  rondap_local = 0,  rondap_visita = 0,    terminado = False)
+		newP.save()	
+
+
+	return render(request,'add-match.html',{'cats':cats,'this_liga':this_liga,'equipos':equipos,'up':ult_partido,'ligas':ligas,'rp':recent_partidos})
+
+def partido(request,p):
+	ligas = Torneo.objects.all().order_by('-id')
+	this_partido = Partido.objects.get(pk=int(p))
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	pl = None
+	pv = None
+	contratos_l = None
+	contratos_v = None
+
+	goles = Gol.objects.filter(partido=this_partido).order_by('minuto','adicional')
+
+	if this_partido.local.id in [1,2,3]:
+		contratos_l = Contrato.objects.filter(equipo=this_partido.local, fec_fin__isnull=True).order_by('jugador__nombre')
+
+	if this_partido.visita.id in [1,2,3]:
+		contratos_v = Contrato.objects.filter(equipo=this_partido.visita, fec_fin__isnull=True).order_by('jugador__nombre')
+
+
+	next_m = Partido.objects.filter(torneo=this_partido.torneo, fecha__gte=this_partido.fecha,terminado=False).exclude(id=this_partido.id).order_by('fecha','id')
+
+	if request.method == 'POST':
+		goles_local = request.POST.get("goles_local")
+		goles_visita = request.POST.get("goles_visita")
+
+		if request.POST.get("pl",""):
+			pl = request.POST.get("pl","")
+		if request.POST.get("pv",""):
+			pv = request.POST.get("pv","")
+
+		this_partido.goles_local = int(goles_local)
+		this_partido.goles_visita = int(goles_visita)
+		if pl or pv:
+			this_partido.rondap_local = int(pl)
+			this_partido.rondap_visita = int(pv)
+		this_partido.terminado = True
+		this_partido.save()
+
+	return render(request,'partido.html',{'cats':cats,'this_partido':this_partido,'next_m':next_m,'ligas':ligas,'contratos_l':contratos_l,'contratos_v':contratos_v,'goles':goles})
+
+
+def futbol(request,p):
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	ligas = Torneo.objects.all().order_by('-id')
+	conteo_p = Partido.objects.filter(terminado=False).count()
+	if p == '0' and conteo_p > 0:
+		partidos = Partido.objects.filter(terminado=False).order_by('fecha','id')
+	else:
+		partidos = Partido.objects.filter(terminado=True).order_by('-fecha','id')
+
+
+	cm = []
+	cligas = Partido.objects.filter(terminado=False).values_list('torneo__nombre', flat=True).distinct()
+	for l in cligas:
+		partidos_pj = Partido.objects.filter(terminado=False, torneo__nombre=l)
+		cm.append({'liga':l,'partidos':partidos_pj})
+
+	return render(request,'futbol.html',{'cats':cats,'ligas':ligas,'partidos':partidos,'tc':p,'cm':cm})
+
+def regGol(request):
+	contrato = request.POST.get("contrato")
+	goal_str = request.POST.get("goal_str")
+	tipo = request.POST.get("tipo")
+	partido = request.POST.get("partido")
+
+	this_partido = Partido.objects.get(pk=int(partido))
+	this_contrato = Contrato.objects.get(pk=int(contrato))
+	is_local = True if tipo == 'local' else False
+
+	pedazos = goal_str.split(',')
+
+	if len(pedazos) == 1:
+		minutos = pedazos[0].split('+')
+		if len(minutos) == 1:
+			minuto = int(minutos[0])
+			adicional = 0
+		else:
+			minuto = int(minutos[0])
+			adicional = int(minutos[1])
+
+		autogol = False
+		penalty = False
+	elif len(pedazos) == 2:
+		minutos = pedazos[0].split('+')
+		if len(minutos) == 1:
+			minuto = int(minutos[0])
+			adicional = 0
+		else:
+			minuto = int(minutos[0])
+			adicional = int(minutos[1]) 
+		attr = pedazos[1]
+		if attr.lower() == 'p':
+			autogol = False
+			penalty = True
+		elif attr.lower() == 'a':
+			autogol = True
+			penalty = False
+
+	if autogol == True:
+		this_contrato = Contrato.objects.get(pk=4)
+
+
+	newG = Gol.objects.create(partido=this_partido,
+		contrato=this_contrato,
+		minuto=minuto,
+		adicional = adicional,
+		penalty=penalty,
+		autogol=autogol,
+		gol_local = is_local
+		)
+	newG.save()
+
+	return redirect(f"/partido/{this_partido.id}")
+
+def addTeams(request,liga):
+	this_liga = Torneo.objects.get(pk=int(liga))
+	equipos = Equipo.objects.all().order_by('nombre')
+	ligas = Torneo.objects.all().order_by('-id')
+	if request.method == 'POST':
+		for e in equipos:
+			if e.nombre in request.POST:
+				equ = Equipo.objects.get(pk=e.id)
+				nL = RelTorneoEquipo.objects.create(torneo=this_liga, equipo = equ)
+		return redirect(f'/liga/{this_liga.id}')
+
+	return render(request,'relacionar.html',{'this_liga':this_liga,'equipos':equipos,'ligas':ligas})
+
+def alineacion(request,partido,equipo):
+	this_partido = Partido.objects.get(pk=int(partido))
+	this_equipo = Equipo.objects.get(pk=int(equipo))
+	ligas = Torneo.objects.all().order_by('-id')
+	
+	these_alineaciones = Alineacion.objects.filter(partido=this_partido, equipo=this_equipo).order_by('contrato__n_posicion','contrato__dorsal')
+	alineaciones = Alineacion.objects.filter(partido=this_partido, equipo=this_equipo).values_list('contrato__id', flat=True)
+	ids_list = list(alineaciones)
+	contratos = Contrato.objects.filter(equipo=this_equipo).exclude(id__in=ids_list).order_by('jugador__nombre')
+
+	if request.method == 'POST':
+		for c in contratos:
+			if str(c.id) in request.POST:
+				tipo = request.POST.get(str(c.id))
+				this_contrato = Contrato.objects.get(pk=c.id)
+
+				newA = Alineacion.objects.create(partido=this_partido, equipo=this_equipo, contrato=this_contrato, tipo= tipo)
+				newA.save()
+		return redirect(f"/alineacion/{this_partido.id}/{this_equipo.id}")
+
+
+	return render(request,'alineacion.html',{'this_partido':this_partido,'contratos':contratos,'ligas':ligas,'alineaciones':these_alineaciones})
+
+
+def journal(request):
+	get_y = request.GET.get('y', 1)
+	max_year = JournalEntry.objects.all().order_by('-fecha').first()
+
+	this_y = max_year.fecha.year if int(get_y) == 1 else int(get_y)
+
+	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	entries = JournalEntry.objects.filter(fecha__year=this_y).order_by('-fecha','-id')
+
+	anhos = JournalEntry.objects.all().values('fecha__year').exclude(fecha__year=this_y).annotate(qbooks=Count('id')).order_by('-fecha__year')
+
+	if request.method == 'POST':
+		fecha = request.POST.get("fecha")
+		# Convert string to datetime object
+		date_obj = datetime.strptime(fecha, "%Y-%m-%d")
+		# Format it to desired string
+		formatted_date = date_obj.strftime("%A, %B %d, %Y")
+		tipo = Category.objects.get(pk=14)
+		contenido = request.POST.get("contenido")
+		newI = Item.objects.create(titulo=formatted_date,tipo=tipo,contenido=contenido,fecha_creacion=datetime.now(),fecha_edicion=datetime.now(),consumido=False)
+		newI.save()
+
+		newJ = JournalEntry.objects.create(fecha=fecha, item = newI)
+		newJ.save()
+	return render(request,'journal.html',{'cats':cats,'entries':entries,'this_y':this_y,'anhos':anhos})
+
 
 
