@@ -23,9 +23,7 @@
         {% for i in m.partidos %}
         <tr>
           <td>{{i.fecha|date:"m/d"}}</td>
-          <td>{{i.local.nombre}}</td>
-          <td><a href="{% url 'partido' i.id %}">vs</a></td>
-          <td>{{i.visita.nombre}}</td>
+          <td><a href="{% url 'partido' i.id %}" style="color:black; text-decoration:none;">{{i.local.nombre}}<br>{{i.visita.nombre}}</a></td>
           <td>{{i.fase}}</td>
         </tr>
         {% endfor %}
@@ -41,11 +39,9 @@
   {% for p in partidos %}
   <tr>
     <td>{{p.fecha|date:"m/d"}}</td>
-    <td>{{p.local.nombre}}</td>
-    <td style="text-align:center;"><a href="{% url 'partido' p.id %}" style="color:blue; text-decoration: none;">{{p.marcador}}</a></td>
-    <td>{{p.visita.nombre}}</td>
+    <td>{{p.local.nombre}}<br>{{p.visita.nombre}}</td>
+    <td style="text-align:center;"><a href="{% url 'partido' p.id %}" style="color:blue; text-decoration: none;">{{p.goles_local}}<br>{{p.goles_visita}}</a></td>
     <td><a href="{% url 'liga' p.torneo.id %}" style="color:blue; text-decoration: none;">{{p.torneo.nombre}}</a></td>
-    <td>{{p.fase}}</td>
   </tr>
   {% endfor %}
   </table>

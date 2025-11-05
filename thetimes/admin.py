@@ -17,6 +17,7 @@ admin.site.register(Gol)
 admin.site.register(Torneo)
 admin.site.register(Alineacion)
 admin.site.register(RelTorneoEquipo)
+admin.site.register(JournalEntry)
 
 
 

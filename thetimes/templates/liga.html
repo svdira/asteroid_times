@@ -16,9 +16,7 @@
   {% for p in pp %}
   <tr>
     <td>{{p.fecha|date:"m/d"}}</td>
-    <td>{{p.local.nombre}}</td>
-    <td><a href="{% url 'partido' p.id %}">vs</a></td>
-    <td>{{p.visita.nombre}}</td>
+    <td><a href="{% url 'partido' p.id %}" style="text-decoration: none; color: black;">{{p.local.nombre}}<br>{{p.visita.nombre}}</a></td>
     <td>{{p.fase}}</td>
   </tr>
   {% endfor %}
@@ -37,9 +35,9 @@
   {% for p in pt %}
   <tr>
     <td>{{p.fecha|date:"m/d"}}</td>
-    <td>{{p.local.nombre}}</td>
-    <td style="text-align:center;"><a href="{% url 'partido' p.id %}" style="color:blue; text-decoration: none;">{{p.marcador}}</a></td>
-    <td>{{p.visita.nombre}}</td>
+    <td>{{p.local.nombre}}<br>{{p.visita.nombre}}</td>
+    <td style="text-align:center;"><a href="{% url 'partido' p.id %}" style="color:blue; text-decoration: none;">{{p.goles_local}}<br>{{p.goles_visita}}</a></td>
+
     <td>{{p.fase}}</td>
   </tr>
   {% endfor %}

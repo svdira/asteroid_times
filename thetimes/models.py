@@ -85,8 +85,8 @@ class Item(models.Model):
 
     @property
     def periodo(self):
-        this_v = None
-        pubyear = None
+        this_v = ''
+        pubyear = 0
         if self.tipo.category.lower() in ['book','bunko']:
             npubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').count()
             if npubyear > 0:
@@ -236,9 +236,9 @@ class Partido(models.Model):
     torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE)
     local = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='local')
     visita = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='visita')
-    fase = models.CharField(max_length=200,default='MD')  
+    fase = models.CharField(max_length=200,default='MD')
     goles_local = models.IntegerField()
-    goles_visita = models.IntegerField()    
+    goles_visita = models.IntegerField()
     rondap_local = models.IntegerField()
     rondap_visita = models.IntegerField()
     terminado = models.BooleanField()
@@ -247,7 +247,7 @@ class Partido(models.Model):
     def __str__(self):
         return self.local.nombre + ' v ' + self.visita.nombre + ' @ ' + self.torneo.nombre
 
-    
+
     @property
     def gl(self):
         return Gol.objects.filter(partido=self, gol_local=True).count()
@@ -290,11 +290,11 @@ class Gol(models.Model):
 
     def __str__(self):
         return self.contrato.jugador.nombre + 'on partido: ' + str(self.partido.id) + ' @ ' + str(self.minuto)
- 
+
 
 class Alineacion(models.Model):
     partido = models.ForeignKey(Partido, on_delete=models.CASCADE)
-    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE) 
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
     contrato = models.ForeignKey(Contrato,on_delete=models.CASCADE)
     tipo = models.CharField(max_length=75)
 

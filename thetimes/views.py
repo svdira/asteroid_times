@@ -13,13 +13,15 @@ import math
 import random
 import re
 import locale
+from itertools import groupby
+from operator import itemgetter
 
 
 def plantilla(request):
 	return render(request,'base_times.html',{})
 
 def addItem(request):
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 
 	if request.method == 'POST':
 		titulo = request.POST.get("titulo")
@@ -29,9 +31,11 @@ def addItem(request):
 
 		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime','tv series','season']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
+		    newI.save()
 		else:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
-		newI.save()
+		    newI.save()
+
 
 		return redirect(f'/edit-item/{newI.id}')
 
@@ -103,10 +107,10 @@ def editItem(request,i):
 
 def homepage(request):
 	page = request.GET.get('page', 1)
-	articles = Item.objects.all().order_by('-fecha_creacion')
+	articles = Item.objects.exclude(tipo__id=14).order_by('-fecha_creacion')
 	paginator = Paginator(articles, 12)
 	resultados = paginator.get_page(page)
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	if page == 1:
 	    in_progress = Consumo.objects.filter(fec_fin__isnull=True)
 	else:
@@ -121,14 +125,14 @@ def categoria(request,c):
 	articles = Item.objects.filter(tipo__id=int(c)).order_by('-fecha_creacion')
 	paginator = Paginator(articles, 12)
 	resultados = paginator.get_page(page)
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 
 	return render(request,'category.html',{'this_cat':this_cat,'articles':resultados,'cats':cats})
 
 
 def item(request,i):
 	this_item = Item.objects.get(pk=int(i))
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	ncon = Consumo.objects.filter(item = this_item, fec_fin__isnull=True).count()
 	if ncon > 0:
 		con_in_prog = Consumo.objects.filter(item = this_item, fec_fin__isnull=True).latest('id')
@@ -217,14 +221,14 @@ def bookHistory(request):
 
 
 	qbooks = qbooks + len(in_progress)
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	return render(request,'read-history.html',{'books':books,'nr_books':nr_books,'this_y':this_y,'anhos':anhos,'rbooks':rbooks,'qbooks':qbooks,'cats':cats,'anhos':anhos})
 
 def bookQueue(request):
-	books = Item.objects.filter(tipo__category='Book',consumo__item__isnull=True).order_by('titulo')
+	books = sorted(Item.objects.filter(tipo__category='Book',consumo__item__isnull=True), key=lambda t: t.periodo, reverse=False)
 	qbooks = len(books)
 	rbooks =  Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).count()
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	in_progress = Consumo.objects.filter(item__tipo__category='Book', fec_fin__isnull=True)
 	qbooks = qbooks + len(in_progress)
 	return render(request,'read-queue.html',{'now_reading':in_progress,'books':books,'rbooks':rbooks,'qbooks':qbooks,'cats':cats})
@@ -235,15 +239,15 @@ def relatedItems(request,item):
 	tipos = []
 	categories = AttrItem.objects.filter(item=this_item).values_list('child__tipo__category', flat=True).distinct()
 	for cat in categories:
-		items_cat = AttrItem.objects.filter(item=this_item, child__tipo__category=cat)
+		items_cat = sorted(AttrItem.objects.filter(item=this_item, child__tipo__category=cat),  key=lambda t: t.child.periodo, reverse=False)
 		tipos.append({'cat':cat,'items':items_cat})
 
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 
 	return render(request,'related-items.html',{'this_item':this_item,'tipos':tipos,'cats':cats})
 
 def addChildItem(request, parent):
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	this_parent = Item.objects.get(pk=int(parent))
 
 	if request.method == 'POST':
@@ -253,8 +257,13 @@ def addChildItem(request, parent):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
-		newI.save()
+		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime','tv series','season']:
+		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
+		    newI.save()
+		else:
+		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
+		    newI.save()
+
 
 		newRel = AttrItem.objects.create(item=this_parent,child=newI,rel_name=relacion)
 		newRel.save()
@@ -266,7 +275,7 @@ def addChildItem(request, parent):
 def searchPage(request):
 	results = None
 	results_2 = None
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 
 	if request.method == 'POST':
 		key_word = request.POST.get("key_word")
@@ -285,7 +294,7 @@ def printHTML(request, cid):
 
 
 def addContrato(request,equipo):
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	equipo = Equipo.objects.get(pk=int(equipo))
 
 	if request.method == 'POST':
@@ -307,8 +316,8 @@ def addContrato(request,equipo):
 			n_p = 4
 		else:
 			n_p = 0
-		
-		
+
+
 
 		newJ = Jugador.objects.create(nombre=nombre, pais=pais, info=info)
 		newJ.save()
@@ -321,7 +330,7 @@ def addContrato(request,equipo):
 
 
 def equipo(request,equipo):
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	equipo = Equipo.objects.get(pk=int(equipo))
 	ligas = Torneo.objects.all().order_by('-id')
 
@@ -338,7 +347,7 @@ def equipo(request,equipo):
 def liga(request,liga):
 	ligas = Torneo.objects.all().order_by('-id')
 	this_liga = Torneo.objects.get(pk=int(liga))
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	pp = Partido.objects.filter(torneo=this_liga, terminado=False).order_by('fecha','id')
 	pt = Partido.objects.filter(torneo=this_liga, terminado=True).order_by('-fecha','id')
 
@@ -347,7 +356,7 @@ def liga(request,liga):
 def addMatch(request,liga):
 	this_liga = Torneo.objects.get(pk=int(liga))
 	ligas = Torneo.objects.all().order_by('-id')
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	equipos = RelTorneoEquipo.objects.filter(torneo=this_liga).order_by('equipo__nombre')
 	ult_partido = Partido.objects.latest('id')
 
@@ -360,7 +369,9 @@ def addMatch(request,liga):
 		fecha = request.POST.get("fecha")
 
 		newP = Partido.objects.create(fecha = fecha,torneo = this_liga,  local = local, visita = visit,fase =fase,  goles_local = 0,  goles_visita = 0,  rondap_local = 0,  rondap_visita = 0,    terminado = False)
-		newP.save()	
+		newP.save()
+
+		ult_partido = Partido.objects.latest('id')
 
 
 	return render(request,'add-match.html',{'cats':cats,'this_liga':this_liga,'equipos':equipos,'up':ult_partido,'ligas':ligas,'rp':recent_partidos})
@@ -386,8 +397,9 @@ def partido(request,p):
 	next_m = Partido.objects.filter(torneo=this_partido.torneo, fecha__gte=this_partido.fecha,terminado=False).exclude(id=this_partido.id).order_by('fecha','id')
 
 	if request.method == 'POST':
-		goles_local = request.POST.get("goles_local")
-		goles_visita = request.POST.get("goles_visita")
+		marcador = request.POST.get("marcador").split("-")
+		goles_local = marcador[0].strip()
+		goles_visita = marcador[1].strip()
 
 		if request.POST.get("pl",""):
 			pl = request.POST.get("pl","")
@@ -414,12 +426,13 @@ def futbol(request,p):
 	else:
 		partidos = Partido.objects.filter(terminado=True).order_by('-fecha','id')
 
-
 	cm = []
-	cligas = Partido.objects.filter(terminado=False).values_list('torneo__nombre', flat=True).distinct()
-	for l in cligas:
-		partidos_pj = Partido.objects.filter(terminado=False, torneo__nombre=l)
-		cm.append({'liga':l,'partidos':partidos_pj})
+	matches = Partido.objects.filter(terminado=False).select_related('torneo').order_by('torneo__nombre', 'fecha')
+	for liga, group in groupby(matches, key=lambda x: x.torneo.nombre):
+		group_list = list(group)
+		min_fecha = min(p.fecha for p in group_list)
+		cm.append({'liga': liga, 'partidos': group_list, 'min_fecha': min_fecha})
+	cm.sort(key=lambda x: x['min_fecha'])
 
 	return render(request,'futbol.html',{'cats':cats,'ligas':ligas,'partidos':partidos,'tc':p,'cm':cm})
 
@@ -453,7 +466,7 @@ def regGol(request):
 			adicional = 0
 		else:
 			minuto = int(minutos[0])
-			adicional = int(minutos[1]) 
+			adicional = int(minutos[1])
 		attr = pedazos[1]
 		if attr.lower() == 'p':
 			autogol = False
@@ -480,8 +493,13 @@ def regGol(request):
 
 def addTeams(request,liga):
 	this_liga = Torneo.objects.get(pk=int(liga))
-	equipos = Equipo.objects.all().order_by('nombre')
+
 	ligas = Torneo.objects.all().order_by('-id')
+	listed_teams = RelTorneoEquipo.objects.filter(torneo = this_liga).values_list('equipo__id', flat=True)
+	ids_list = list(listed_teams)
+
+	equipos = Equipo.objects.exclude(id__in=ids_list).order_by('nombre')
+
 	if request.method == 'POST':
 		for e in equipos:
 			if e.nombre in request.POST:
@@ -495,7 +513,7 @@ def alineacion(request,partido,equipo):
 	this_partido = Partido.objects.get(pk=int(partido))
 	this_equipo = Equipo.objects.get(pk=int(equipo))
 	ligas = Torneo.objects.all().order_by('-id')
-	
+
 	these_alineaciones = Alineacion.objects.filter(partido=this_partido, equipo=this_equipo).order_by('contrato__n_posicion','contrato__dorsal')
 	alineaciones = Alineacion.objects.filter(partido=this_partido, equipo=this_equipo).values_list('contrato__id', flat=True)
 	ids_list = list(alineaciones)
@@ -521,7 +539,7 @@ def journal(request):
 
 	this_y = max_year.fecha.year if int(get_y) == 1 else int(get_y)
 
-	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	entries = JournalEntry.objects.filter(fecha__year=this_y).order_by('-fecha','-id')
 
 	anhos = JournalEntry.objects.all().values('fecha__year').exclude(fecha__year=this_y).annotate(qbooks=Count('id')).order_by('-fecha__year')

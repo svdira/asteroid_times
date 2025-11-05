@@ -15,14 +15,13 @@
   <table>
     <tr>
       <td>{{this_partido.local.nombre}}</td>
-      <td><input type="text" name="goles_local" style="width:3em; text-align: center; padding-top:0.5em;padding-bottom:0.5em;"></td>
-    </tr>
-    <tr>
+      <td><input type="text" name="marcador" style="width:6em; text-align: center; padding-top:0.5em;padding-bottom:0.5em;"></td>
+  
       <td>{{this_partido.visita.nombre}}</td>
-      <td><input type="text" name="goles_visita" style="width:3em; text-align: center; padding-top:0.5em;padding-bottom:0.5em;"></td>
+     
     </tr>
     <tr>
-      <td colspan="2" style="text-align: center;"><input type="submit" value="Save"></td>
+      <td colspan="3" style="text-align: center;"><input type="submit" value="Save"></td>
     </tr>
   </table>
 </form>
@@ -82,10 +81,7 @@
   {% for p in next_m %}
   <tr>
     <td>{{p.fecha|date:"m/d"}}</td>
-    <td>{{p.local.nombre}}</td>
-    <td><a href="{% url 'partido' p.id %}">vs</a></td>
-    <td>{{p.visita.nombre}}</td>
-    <td><a href="{% url 'liga' p.torneo.id %}" style="color:blue; text-decoration: none;">{{p.torneo.nombre}}</a></td>
+    <td><a href="{% url 'partido' p.id %}" style="text-decoration: none; color:black;">{{p.local.nombre}}<br>{{p.visita.nombre}}</a></td>
     <td>{{p.fase}}</td>
   </tr>
   {% endfor %}
