@@ -12,7 +12,7 @@
       <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}}{% if a.nrelated > 0 %} | <a href="{% url 'relatedItems' a.id %}" style="text-decoration:none; color:grey;">Related ({{a.nrelated}})</a>{% endif %}</span></p>
       {{a.headtext|safe}}
       <div style="clear:both;"></div>
-      <hr style="margin-bottom: 2em; margin-top: 1em;">
+      <hr style="margin-bottom: 0.9em; margin-top: 0em;">
     {% endfor %}
   {% endif %}
 
@@ -41,6 +41,6 @@
         <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
       {% endif %}
     {% endfor %}
-  
+
 </ul>
 {% endblock %}

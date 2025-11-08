@@ -421,20 +421,25 @@ def futbol(request,p):
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
 	ligas = Torneo.objects.all().order_by('-id')
 	conteo_p = Partido.objects.filter(terminado=False).count()
-	if p == '0' and conteo_p > 0:
-		partidos = Partido.objects.filter(terminado=False).order_by('fecha','id')
-	else:
-		partidos = Partido.objects.filter(terminado=True).order_by('-fecha','id')
 
 	cm = []
-	matches = Partido.objects.filter(terminado=False).select_related('torneo').order_by('torneo__nombre', 'fecha')
-	for liga, group in groupby(matches, key=lambda x: x.torneo.nombre):
-		group_list = list(group)
-		min_fecha = min(p.fecha for p in group_list)
-		cm.append({'liga': liga, 'partidos': group_list, 'min_fecha': min_fecha})
-	cm.sort(key=lambda x: x['min_fecha'])
+	if p == '0' and conteo_p > 0:
+		matches = Partido.objects.filter(terminado=False).select_related('torneo').order_by('torneo__nombre', 'fecha')
+		for liga, group in groupby(matches, key=lambda x: x.torneo.nombre):
+			group_list = list(group)
+			min_fecha = min(p.fecha for p in group_list)
+			cm.append({'liga': liga, 'partidos': group_list, 'min_fecha': min_fecha})
+		cm.sort(key=lambda x: x['min_fecha'])
+	else:
+		matches = Partido.objects.filter(terminado=True).select_related('torneo').order_by('torneo__nombre', '-fecha')
+		for liga, group in groupby(matches, key=lambda x: x.torneo.nombre):
+			group_list = list(group)
+			min_fecha = max(p.fecha for p in group_list)
+			cm.append({'liga': liga, 'partidos': group_list[0:5], 'min_fecha': min_fecha})
+		cm.sort(key=lambda x: x['min_fecha'], reverse=True)
+	
 
-	return render(request,'futbol.html',{'cats':cats,'ligas':ligas,'partidos':partidos,'tc':p,'cm':cm})
+	return render(request,'futbol.html',{'cats':cats,'ligas':ligas,'tc':p,'cm':cm})
 
 def regGol(request):
 	contrato = request.POST.get("contrato")
@@ -549,7 +554,7 @@ def journal(request):
 		# Convert string to datetime object
 		date_obj = datetime.strptime(fecha, "%Y-%m-%d")
 		# Format it to desired string
-		formatted_date = date_obj.strftime("%A, %B %d, %Y")
+		formatted_date = date_obj.strftime("%A, %B %e, %Y")
 		tipo = Category.objects.get(pk=14)
 		contenido = request.POST.get("contenido")
 		newI = Item.objects.create(titulo=formatted_date,tipo=tipo,contenido=contenido,fecha_creacion=datetime.now(),fecha_edicion=datetime.now(),consumido=False)

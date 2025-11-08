@@ -23,28 +23,38 @@
         {% for i in m.partidos %}
         <tr>
           <td>{{i.fecha|date:"m/d"}}</td>
-          <td><a href="{% url 'partido' i.id %}" style="color:black; text-decoration:none;">{{i.local.nombre}}<br>{{i.visita.nombre}}</a></td>
+          <td><p><a href="{% url 'partido' i.id %}" style="color:black; text-decoration:none;">{{i.local.nombre}}<br>{{i.visita.nombre}}</a></p></td>
           <td>{{i.fase}}</td>
         </tr>
         {% endfor %}
 
-      </table>   <br> 
+      </table>   <br>
     {% endfor %}
   {% endif %}
 
 {% else %}
 
-  <table>
-    <tr><th colspan="6">Last Matches</th></tr>
-  {% for p in partidos %}
-  <tr>
-    <td>{{p.fecha|date:"m/d"}}</td>
-    <td>{{p.local.nombre}}<br>{{p.visita.nombre}}</td>
-    <td style="text-align:center;"><a href="{% url 'partido' p.id %}" style="color:blue; text-decoration: none;">{{p.goles_local}}<br>{{p.goles_visita}}</a></td>
-    <td><a href="{% url 'liga' p.torneo.id %}" style="color:blue; text-decoration: none;">{{p.torneo.nombre}}</a></td>
-  </tr>
-  {% endfor %}
-  </table>
+<h2><a href="{% url 'futbol' 0 %}">Coming Matches</a> | Finished</h2><br>
+
+ {% if cm %}
+    {% for m in cm %}
+      <table>
+        <tr>
+          <th colspan="6" style="text-align: left;">{{m.liga}}</th>
+        </tr>
+        {% for i in m.partidos %}
+        <tr>
+          <td>{{i.fecha|date:"m/d"}}</td>
+          <td><p><a href="{% url 'partido' i.id %}" style="color:black; text-decoration:none;">{{i.local.nombre}}<br>{{i.visita.nombre}}</a></p></td>
+          <td style="text-align:right;"><p><a href="{% url 'partido' i.id %}" style="color:blue; text-decoration: none;">{{i.goles_local}}<br>{{i.goles_visita}}</a></p></td>
+          <td>{{i.fase}}</td>
+        </tr>
+        {% endfor %}
+
+      </table>   <br>
+    {% endfor %}
+  {% endif %}
+
 
 {% endif %}
 
@@ -56,10 +66,10 @@
 
 <ul class="list-group">
     {% for c in ligas %}
-    
+
 
         <li class="list-group-item"><a href="{% url 'liga' c.id %}" style="text-decoration:none; color:black;">{{c.nombre}}</a> <span class="badge badge-pill">{{c.npartidos}}</span></li>
-      
+
     {% endfor %}
 
 </ul>

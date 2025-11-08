@@ -33,11 +33,11 @@
 
     .contenedor {
      max-width: 100%;
-      padding: 0.3em 0.2em 1.0em 0.2em;
+      padding: 1.0em 0.0em 1.0em 0.0em;
       background: white;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 5px;
     }
 
     /* Imagen encabezado */
@@ -45,6 +45,8 @@
       width: 100%;
       height: auto;
       border-radius: 8px;
+      margin-bottom:0px;
+      padding:0px;
 
     }
 
@@ -52,7 +54,8 @@
     .fecha {
       text-align: center;
       font-size: 1em;
-      padding: 10px 0;
+      padding: 10px 0px;
+      margin:0px;
       border-top: 1px solid #ccc;
       border-bottom: 1px solid #ccc;
       color: black;
@@ -325,6 +328,14 @@ table {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+table p{
+    line-height:1.9;
+    margin:0px;
+    padding:0px;
+    text-indent:0px;
+    font-family:"Segoe UI", Tahoma, sans-serif;
+    font-size:0.95rem;
+}
 /* Table header */
 thead {
   background: linear-gradient(135deg, #4a90e2, #357abd);
@@ -385,7 +396,7 @@ table thead tr:first-child th:last-child {
 </head>
 <body>
   <div class="contenedor">
-    <div class="encabezado">
+    <div class="encabezado" sytle="padding:0px; margin: 0px;">
       <a href="{% url 'homepage' %}"><img src="/media/assets/times_logo.png" alt="Imagen encabezado"></a>
     </div>
 
