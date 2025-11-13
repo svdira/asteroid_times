@@ -118,6 +118,24 @@ def homepage(request):
 
 	return render(request,'homepage.html',{'articles':resultados,'cats':cats,'in_progress':in_progress})
 
+def gallery(request,item_id):
+	page = request.GET.get('page', 1)
+	if int(item_id) == 0:
+		articles = AttrImage.objects.all().order_by('-item__fecha_creacion')
+		this_item = None
+	else:
+		articles = AttrImage.objects.filter(item__id=int(item_id)).order_by('-item__fecha_creacion')
+		this_item = Item.objects.get(pk=int(item_id))
+	paginator = Paginator(articles, 12)
+	resultados = paginator.get_page(page)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	return render(request,'gallery.html',{'articles':resultados,'this_item':this_item,'cats':cats})
+
+def photo(request,photo_id):
+	this_photo = AttrImage.objects.get(pk=int(photo_id))
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	return render(request,'photo.html',{'this_photo':this_photo,'cats':cats})
+
 
 def categoria(request,c):
 	page = request.GET.get('page', 1)
@@ -141,6 +159,8 @@ def item(request,i):
 
 	conteo_rel = AttrItem.objects.filter(item=this_item).count()
 
+	tweets = Tweet.objects.filter(item=this_item)
+
 	if request.method == 'POST':
 		con_in_prog.fec_fin = request.POST.get("fec_fin")
 		con_in_prog.save()
@@ -148,7 +168,7 @@ def item(request,i):
 		this_item.consumido = True
 		this_item.save()
 
-	return render(request,'item.html',{'this_item':this_item,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel})
+	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel})
 
 def startConsumo(request,i):
 	this_item = Item.objects.get(pk=int(i))
@@ -223,6 +243,37 @@ def bookHistory(request):
 	qbooks = qbooks + len(in_progress)
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	return render(request,'read-history.html',{'books':books,'nr_books':nr_books,'this_y':this_y,'anhos':anhos,'rbooks':rbooks,'qbooks':qbooks,'cats':cats,'anhos':anhos})
+
+
+def movieHistory(request):
+	get_y = request.GET.get('y', 1)
+	max_year = Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False).order_by('-fec_fin').first()
+
+	this_y = max_year.fec_fin.year if int(get_y) == 1 else int(get_y)
+
+	books = Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False, fec_fin__year=this_y).order_by('-fec_fin')
+	rbooks = len(books)
+	qbooks = Item.objects.filter(tipo__category='Movie',consumo__item__isnull=True).count()
+	in_progress = Consumo.objects.filter(item__tipo__category='Movie', fec_fin__isnull=True)
+
+	nr_books = Item.objects.filter(tipo__category='Movie',consumido	= True).count()
+
+
+	anhos = Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False).values('fec_fin__year').annotate(qbooks=Count('id')).order_by('-fec_fin__year')
+
+
+	qbooks = qbooks + len(in_progress)
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	return render(request,'watch-history.html',{'books':books,'nr_books':nr_books,'this_y':this_y,'anhos':anhos,'rbooks':rbooks,'qbooks':qbooks,'cats':cats,'anhos':anhos})
+
+def movieQueue(request):
+	books = sorted(Item.objects.filter(tipo__category='Movie',consumo__item__isnull=True), key=lambda t: t.periodo, reverse=False)
+	qbooks = len(books)
+	rbooks =  Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False).count()
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	in_progress = Consumo.objects.filter(item__tipo__category='Movie', fec_fin__isnull=True)
+	qbooks = qbooks + len(in_progress)
+	return render(request,'watch-queue.html',{'now_reading':in_progress,'books':books,'rbooks':rbooks,'qbooks':qbooks,'cats':cats})
 
 def bookQueue(request):
 	books = sorted(Item.objects.filter(tipo__category='Book',consumo__item__isnull=True), key=lambda t: t.periodo, reverse=False)
@@ -423,7 +474,7 @@ def futbol(request,p):
 	conteo_p = Partido.objects.filter(terminado=False).count()
 
 	cm = []
-	if p == '0' and conteo_p > 0:
+	if p == '0':
 		matches = Partido.objects.filter(terminado=False).select_related('torneo').order_by('torneo__nombre', 'fecha')
 		for liga, group in groupby(matches, key=lambda x: x.torneo.nombre):
 			group_list = list(group)
@@ -437,7 +488,7 @@ def futbol(request,p):
 			min_fecha = max(p.fecha for p in group_list)
 			cm.append({'liga': liga, 'partidos': group_list[0:5], 'min_fecha': min_fecha})
 		cm.sort(key=lambda x: x['min_fecha'], reverse=True)
-	
+
 
 	return render(request,'futbol.html',{'cats':cats,'ligas':ligas,'tc':p,'cm':cm})
 
@@ -563,6 +614,15 @@ def journal(request):
 		newJ = JournalEntry.objects.create(fecha=fecha, item = newI)
 		newJ.save()
 	return render(request,'journal.html',{'cats':cats,'entries':entries,'this_y':this_y,'anhos':anhos})
+
+def addTweet(request):
+	item = Item.objects.get(pk=int(request.POST.get("item_id")))
+	texto = request.POST.get("tweet")
+	if len(texto)>10:
+		newT = Tweet.objects.create(item=item,ttext=texto)
+		newT.save()
+
+	return redirect(f"/item/{item.id}")
 
 
 

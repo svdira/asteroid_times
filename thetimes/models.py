@@ -41,6 +41,10 @@ class Item(models.Model):
     consumido = models.BooleanField(default=False)
 
     @property
+    def conteo_imgs(self):
+        return AttrImage.objects.filter(item=self).count()
+
+    @property
     def headtext(self):
         n_corte = self.contenido.find('==headtext==')
         if n_corte == -1:
@@ -61,15 +65,15 @@ class Item(models.Model):
     @property
     def credit_links(self):
 
-        if self.tipo.category.lower() == 'book':
-            ncreds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym']).count()
+        if self.tipo.category.lower() in  ['book','movie']:
+            ncreds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym','director']).count()
             if ncreds > 0:
-                creds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym'])
+                creds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym','director'])
 
                 enlaces = ""
 
                 for c in creds:
-                    if c.rel_name != 'author':
+                    if c.rel_name not in  ['author','director']:
                         this_c = "(" + c.credito +")"
                     else:
                         this_c = ""
@@ -311,6 +315,14 @@ class RelTorneoEquipo(models.Model):
 class JournalEntry(models.Model):
     fecha = models.DateField()
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.item.titulo
+
+class Tweet(models.Model):
+    ttime = models.DateTimeField(auto_now_add=True)
+    item = models.ForeignKey(Item,on_delete=models.CASCADE)
+    ttext = models.CharField(max_length=2000)
 
     def __str__(self):
         return self.item.titulo

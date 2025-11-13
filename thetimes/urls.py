@@ -14,6 +14,8 @@ urlpatterns = [
 	path('category/<c>', views.categoria, name='categoria'),
 	path('start-consumo/<i>', views.startConsumo, name='startConsumo'),
 	path('book-history/', views.bookHistory, name='bookHistory'),
+	path('movie-history/', views.movieHistory, name='movieHistory'),
+	path('movie-queue/', views.movieQueue, name='movieQueue'),
 	path('book-queue/', views.bookQueue, name='bookQueue'),
 	path('related-items/<item>', views.relatedItems, name='relatedItems'),
 	path('print-html/<cid>', views.printHTML, name='printHTML'),
@@ -27,4 +29,7 @@ urlpatterns = [
 	path('add-teams/<liga>', views.addTeams, name='addTeams'),
 	path('alineacion/<partido>/<equipo>', views.alineacion, name='alineacion'),
 	path('journal/', views.journal, name='journal'),
+	path('gallery/<item_id>', views.gallery, name='gallery'),
+	path('photo/<photo_id>', views.photo, name='photo'),
+	path('addtweet/', views.addTweet, name='addTweet'),
 	]

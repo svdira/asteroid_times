@@ -1,0 +1,47 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}The Times | Movie History {% endblock %}
+
+{% block izquierda %}
+
+  <h2 style="color:blue;"><a href="{% url 'movieHistory' %}" style="text-decoration:none; color:#007bff; ">A Year of Movies {{this_y}} ({{rbooks}})</a> | <a href="{% url 'movieQueue' %}" style="text-decoration:none; color:grey; ">Movie Queue ({{qbooks}})</a></h2>
+  <br>
+  <ul class="styled-list">
+
+  {% for b in books %}
+    <li>
+      <span class="main-item"><a href="{% url 'item' b.item.id %}" style="text-decoration:none; color:black;">{{b.item.titulo}} {{b.item.periodo}}</a></span>
+      <small class="sub-item"> {{b.fec_fin}}{% if b.item.credit_links %} | By {{b.item.credit_links|safe}}{% endif %}</small>
+    </li>
+  {% endfor %}
+  </ul>
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<h2>Movie Years ({{nr_books}}):</h2>
+
+<ul class="list-group">
+    {% for c in anhos %}
+      
+        <li class="list-group-item"><a href="{% url 'bookHistory' %}?y={{c.fec_fin__year}}" style="text-decoration:none; color:black;">{{c.fec_fin__year}}</a> <span class="badge badge-pill">{{c.qbooks}}</span></li>
+      
+    {% endfor %}
+  
+</ul>
+<br>
+<h2>Categories:</h2>
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+  
+</ul>
+{% endblock %}

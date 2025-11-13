@@ -1,0 +1,54 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}The Times | Home {% endblock %}
+
+{% block izquierda %}
+
+  <h2 style="color:blue;"><a href="{% url 'movieHistory' %}" style="text-decoration:none; color:grey; ">Movie History ({{rbooks}})</a> | Movie Queue ({{qbooks}})</h2>
+  <br>
+  {% if now_reading %}
+  <h3>Now Watching</h3>
+  <ul class="styled-list">
+
+  {% for b in now_reading %}
+    <li>
+      <span class="main-item"><a href="{% url 'item' b.item.id %}" style="text-decoration:none; color:black;">{{b.item.titulo}} {{b.item.periodo}}</a></span>
+      <small class="sub-item">By {{b.item.credit_links|safe}}</small>
+    </li>
+  {% endfor %}
+  </ul>
+
+  {% endif %}
+
+  {% if books %}
+<hr>
+  <h3>Movie Queue</h3>
+  <ul class="styled-list">
+
+  {% for b in books %}
+    <li>
+      <span class="main-item"><a href="{% url 'item' b.id %}" style="text-decoration:none; color:black;">{{b.titulo}} {{b.periodo}}</a></span>
+      <small class="sub-item">By {{b.credit_links|safe}}</small>
+    </li>
+  {% endfor %}
+  </ul>
+  {% else %}
+  <h3 style="color:red;">No Movies in QUEUE</h3>
+  {% endif %}
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+
+</ul>
+{% endblock %}
