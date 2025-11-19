@@ -29,7 +29,7 @@
   {% for b in books %}
     <li>
       <span class="main-item"><a href="{% url 'item' b.id %}" style="text-decoration:none; color:black;">{{b.titulo}} {{b.periodo}}</a></span>
-      <small class="sub-item">By {{b.credit_links|safe}}</small>
+      {% if b.credit_links %}<small class="sub-item">Directed by {{b.credit_links|safe}}</small>{% endif %}
     </li>
   {% endfor %}
   </ul>

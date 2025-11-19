@@ -10,7 +10,7 @@
   <div class="image-grid">
 
     {% for a in articles %}
-    <a href="{% url 'photo' a.id %}"><div class="image-item" style="background-image: url('{{ a.imagen.url }}');"></div></a>
+    <a href="{% url 'photo' a.id %}"><div class="image-item" style="background-image: url('{{ a.thumbnail_path}}');"></div></a>
       
     {% endfor %}
     </div>

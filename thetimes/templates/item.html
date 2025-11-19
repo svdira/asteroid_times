@@ -24,7 +24,7 @@
       <div style="width: 95%;">
         <form style="width: 100%;"  method = 'POST' action="{% url 'addTweet' %}">
           {% csrf_token %}
-          <textarea maxlength="400" rows="4" name="tweet" style="width:100%; padding:1em; font-family: Calibri,Arial,sans-serif; font-size: 1.0em;"></textarea>
+          <textarea maxlength="400" rows="4" name="tweet" style="width:95%; padding:1em; font-family: Calibri,Arial,sans-serif; font-size: 1.0em;"></textarea>
           <input type="submit" name="save" value="Post Comment">
           <input type="hidden" name="item_id" value="{{this_item.id}}">
         </form>

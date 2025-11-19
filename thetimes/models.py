@@ -7,6 +7,8 @@ from uuid import uuid4
 from django.db.models import Q, Avg, Count, Min, Sum
 from random import choice
 import markdown
+from PIL import Image
+
 
 def path_and_name(instance, filename):
     upload_to = 'item_media'
@@ -19,6 +21,19 @@ def path_and_name(instance, filename):
         filename = '{}.{}'.format(uuid4().hex, ext)
     # return the whole path to the file
     return os.path.join(upload_to, filename)
+
+def media_path_2(instance, filename):
+    upload_to = 'item_media/thumbnails'
+    ext = filename.split('.')[-1]
+    # get filename
+    if instance.pk:
+        filename = '{}.{}'.format(instance.pk, ext)
+    else:
+        # set filename as random string
+        filename = '{}.{}'.format(uuid4().hex, ext)
+    # return the whole path to the file
+    return os.path.join(upload_to, filename)
+
 
 class Category(models.Model):
     category = models.CharField(max_length=255)
@@ -166,6 +181,25 @@ class AttrImage(models.Model):
     imagen = models.ImageField(upload_to=path_and_name, max_length=255, null=True, blank=True)
     caption = models.TextField()
     tipo = models.CharField(max_length=30)
+
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.imagen:
+            img_path = self.imagen.path
+            thumb_path = os.path.join(os.path.dirname(img_path),
+                "thumbnails\\" + os.path.basename(img_path))
+            img = Image.open(img_path)
+            img.thumbnail((300, 300))  # <--- thumbnail size
+            img.save(thumb_path)
+
+    @property
+    def thumbnail_path(self):
+        parts = self.imagen.url.split('/')
+        parts.insert(3, 'thumbnails')
+        result = '/'.join(parts)
+        return result
+
 
     def __str__(self):
         return self.tipo + ' @ ' + self.item.titulo
