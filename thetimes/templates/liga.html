@@ -9,6 +9,32 @@
 <h2>{{this_liga.nombre}} Main Page</h2>
 <p><span class="detalles"><a href="{% url 'addMatch' this_liga.id %}"  style="text-decoration:none; color:grey;">Add Match</a> | <a href="{% url 'addTeams' this_liga.id %}"  style="text-decoration:none; color:grey;">Add Teams</a></span></p>
 
+
+{% if tabla %}
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Equipo</th>
+      <th>Pts</th>
+      <th>PJ</th>
+      <th>PG</th>
+      <th>DG</th>
+      <th>GF</th>    
+    </tr>
+    {% for t in tabla %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{t.Equipo}}</td>
+    <td>{{t.Pts}}</td>
+    <td>{{t.PJ}}</td>
+    <td>{{t.PG}}</td>
+    <td>{{t.DG}}</td>
+    <td>{{t.GF}}</td>
+  </tr>
+  {% endfor %}
+  </table><br>
+{% endif %}
+
 {% if pp %}
 
   <table>

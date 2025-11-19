@@ -391,9 +391,35 @@ def equipo(request,equipo):
 	delanteros = Contrato.objects.filter(equipo=equipo, posicion='delantero', fec_fin__isnull=True).order_by('dorsal')
 	dt = Contrato.objects.filter(equipo=equipo, posicion='dt', fec_fin__isnull=True).order_by('dorsal')
 
+	partidos = Partido.objects.filter(Q(local=equipo) | Q(visita=equipo)).exclude(terminado=False).order_by('-fecha')[0:25]
+
+	vector_p = ''
+	for p in partidos:
+		if  p.goles_local == p.goles_visita:
+			this_r = 'D'
+		elif p.local == equipo and p.goles_local > p.goles_visita:
+			this_r = 'W'
+		elif p.local == equipo and p.goles_local < p.goles_visita:
+			this_r = 'L'
+		elif p.visita == equipo and p.goles_local > p.goles_visita:
+			this_r = 'L'
+		elif p.visita == equipo and p.goles_local < p.goles_visita:
+			this_r = 'W'
+
+		vector_p = vector_p + this_r
 
 
-	return render(request,'equipo.html',{'cats':cats,'this_equipo':equipo,'arqueros':arqueros,'defensas':defensas, 'centros':centros,'delanteros':delanteros,'dt':dt,'ligas':ligas})
+	conteo = len(vector_p)
+	ganes = vector_p.count("W")
+	empates = vector_p.count("D")
+	perdidos = vector_p.count("L")
+	
+	stats = [conteo,ganes,empates,perdidos]
+
+
+
+
+	return render(request,'equipo.html',{'cats':cats,'this_equipo':equipo,'arqueros':arqueros,'defensas':defensas, 'centros':centros,'delanteros':delanteros,'vector_p':vector_p,'stats':stats,'dt':dt,'ligas':ligas,'partidos':partidos})
 
 def liga(request,liga):
 	ligas = Torneo.objects.all().order_by('-id')
@@ -401,8 +427,11 @@ def liga(request,liga):
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	pp = Partido.objects.filter(torneo=this_liga, terminado=False).order_by('fecha','id')
 	pt = Partido.objects.filter(torneo=this_liga, terminado=True).order_by('-fecha','id')
+	tabla = None
+	if pt:
+		tabla = Partido.objects.raw(f"select * from posiciones where id={this_liga.id} order by pts desc, PJ desc, PG desc, DG desc")
 
-	return render(request,'liga.html',{'cats':cats,'this_liga':this_liga,'pp':pp,'pt':pt,'ligas':ligas})
+	return render(request,'liga.html',{'cats':cats,'this_liga':this_liga,'pp':pp,'pt':pt,'ligas':ligas,'tabla':tabla})
 
 def addMatch(request,liga):
 	this_liga = Torneo.objects.get(pk=int(liga))

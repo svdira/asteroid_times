@@ -188,7 +188,7 @@ class AttrImage(models.Model):
         if self.imagen:
             img_path = self.imagen.path
             thumb_path = os.path.join(os.path.dirname(img_path),
-                "thumbnails\\" + os.path.basename(img_path))
+                "thumbnails/" + os.path.basename(img_path))
             img = Image.open(img_path)
             img.thumbnail((300, 300))  # <--- thumbnail size
             img.save(thumb_path)
