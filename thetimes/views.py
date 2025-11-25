@@ -112,7 +112,7 @@ def homepage(request):
 	resultados = paginator.get_page(page)
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	if page == 1:
-	    in_progress = Consumo.objects.filter(fec_fin__isnull=True)
+	    in_progress = Consumo.objects.filter(fec_fin__isnull=True).order_by('fec_ini')
 	else:
 	    in_progress = None
 
@@ -413,7 +413,7 @@ def equipo(request,equipo):
 	ganes = vector_p.count("W")
 	empates = vector_p.count("D")
 	perdidos = vector_p.count("L")
-	
+
 	stats = [conteo,ganes,empates,perdidos]
 
 
@@ -429,7 +429,7 @@ def liga(request,liga):
 	pt = Partido.objects.filter(torneo=this_liga, terminado=True).order_by('-fecha','id')
 	tabla = None
 	if pt:
-		tabla = Partido.objects.raw(f"select * from posiciones where id={this_liga.id} order by pts desc, PJ desc, PG desc, DG desc")
+		tabla = Partido.objects.raw(f"select * from posiciones where id={this_liga.id} order by pts desc, DG desc, GF desc, PJ desc")
 
 	return render(request,'liga.html',{'cats':cats,'this_liga':this_liga,'pp':pp,'pt':pt,'ligas':ligas,'tabla':tabla})
 

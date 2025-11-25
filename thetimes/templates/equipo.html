@@ -7,6 +7,29 @@
 
 
 <h2>{{this_equipo.nombre}}'s Main Page</h2>
+
+
+
+{% if partidos %}
+
+<h3>Last {{stats.0}} Matches: {{stats.1}}W/{{stats.2}}D/{{stats.3}}L</h3>
+<p><span style="font-family:Arial,sans-serif;">{{vector_p}}</span></p>
+  <table>
+  <tr><th colspan="5" style="text-align: left;">Last Matches<th></tr>
+
+  {% for p in partidos %}
+  <tr>
+    <td>{{p.fecha|date:"m/d"}}</td>
+    <td><p>{{p.local.nombre}}<br>{{p.visita.nombre}}</p></td>
+    <td style="text-align:right;"><p><a href="{% url 'partido' p.id %}" style="color:blue; text-decoration: none;">{{p.goles_local}}<br>{{p.goles_visita}}</a></p></td>
+
+    <td>{{p.torneo.nombre}}</td>
+  </tr>
+  {% endfor %}
+  </table>
+{% endif %}
+
+
 <p><span class="detalles"><a href="{% url 'addContrato' this_equipo.id %}"  style="text-decoration:none; color:grey;">Add Contract</a></span></p>
 
 
@@ -57,7 +80,7 @@
 
 {% if centros %}
 <br>
-  
+
   <table>
     <th style="text-align: left;">Midfielders</th>
     {% for c in centros %}
@@ -72,7 +95,7 @@
 
 {% if delanteros %}
 <br>
- 
+
   <table>
     <th style="text-align: left;">Forwards</th>
     {% for c in delanteros %}
@@ -86,27 +109,11 @@
 {% endif %}
 
 
-{% if partidos %}
-<br><br>
-<h3>Last {{stats.0}} Matches: {{stats.1}}W/{{stats.2}}D/{{stats.3}}L</h3>
-<p><span style="font-family:Arial,sans-serif;">{{vector_p}}</span></p>
-  <table>
-  <tr><th colspan="5" style="text-align: left;">Last Matches<th></tr>
-
-  {% for p in partidos %}
-  <tr>
-    <td>{{p.fecha|date:"m/d"}}</td>
-    <td><p>{{p.local.nombre}}<br>{{p.visita.nombre}}</p></td>
-    <td style="text-align:right;"><p><a href="{% url 'partido' p.id %}" style="color:blue; text-decoration: none;">{{p.goles_local}}<br>{{p.goles_visita}}</a></p></td>
-
-    <td>{{p.torneo.nombre}}</td>
-  </tr>
-  {% endfor %}
-  </table>
-{% endif %}
-
-
 {% endblock %}
+
+
+
+
 
 
 {% block derecha %}
@@ -115,10 +122,10 @@
 
 <ul class="list-group">
     {% for c in ligas %}
-    
+
 
         <li class="list-group-item"><a href="{% url 'liga' c.id %}" style="text-decoration:none; color:black;">{{c.nombre}}</a> <span class="badge badge-pill">{{c.npartidos}}</span></li>
-      
+
     {% endfor %}
 
 </ul>

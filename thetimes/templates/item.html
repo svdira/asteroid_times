@@ -8,7 +8,9 @@
       <h2>{% if this_item.consumido%}&#9989;&nbsp;{%endif%}{{this_item.titulo}}{% if this_item.periodo %}&nbsp;{{this_item.periodo}}{% endif %}<a href="{% url 'editItem' this_item.id %}" style="text-decoration:none; color:grey;">&#x1F4DD;</a></h2>
       <p><span class="detalles">{{this_item.tipo.category|capfirst}}{% if this_item.fecha_creacion|date:"Y-m-d" != '1999-12-31' %} | {{this_item.fecha_creacion|date:"M j, Y"}}{% endif %}{% if this_item.aplica_consumo %} | <a href="{% url 'startConsumo' this_item.id %}" style="text-decoration:none; color:grey;">Start</a>{% endif %}{% if conteo_r > 0 %} | <a href="{% url 'relatedItems' this_item.id %}" style="text-decoration:none; color:grey;">Related ({{conteo_r}})</a>{% endif %} | <a href="{% url 'addChildItem' this_item.id %}"  style="text-decoration:none; color:grey;">Add Child</a>{% if conteo_r > 0 %} | <a href="{% url 'printHTML' this_item.id %}" target="_blank" style="text-decoration:none; color:grey;">Print</a>{% endif %}{% if this_item.conteo_imgs > 0 %} | <a href="{% url 'gallery' this_item.id %}"  style="text-decoration:none; color:grey;">Gallery</a>{% endif %}</span></p>
 
-       {% if cons %}<form method='POST' style='font-size: 1.2em; text-indent:1.4em;  font-family:  "Claris","Georgia", serif;'>{% csrf_token %}<label>FDate:</label>&nbsp;<input type="text" name="fec_fin" style="width:6em;"  id="datepicker" placeholder="Select date">&nbsp;<input type="submit" value="Finish"></form>{% endif %}
+       {% if cons %}<form method='POST' style='font-size: 1.2em; text-indent:1.4em;  font-family:  "Claris","Georgia", serif;'>{% csrf_token %}<label>FDate:</label>&nbsp;<input type="text" name="fec_fin" style="width:6em;"  id="datepicker" placeholder="Select date">&nbsp;<input type="submit" value="Finish"></form>
+
+       <p>Started at {{cons.fec_ini}}</p>{% endif %}
 
       {% if this_item.credit_links %}<p>By {{this_item.credit_links|safe}}</p>{% endif %}
 
