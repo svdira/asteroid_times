@@ -654,4 +654,90 @@ def addTweet(request):
 	return redirect(f"/item/{item.id}")
 
 
+def moviedbImport(request):
+    import requests
+    import json
+
+    movie_id = request.POST.get("title")
+
+    url = "https://api.themoviedb.org/3/movie/{}?language=en-US".format(movie_id)
+    headers = {
+        "accept": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0NmM4MjVlMDFiY2RiMWQ1NWQ4YjRmYzNiNDQ0ODFhZiIsInN1YiI6IjYwMWM1NmFkNzMxNGExMDAzZGZjMzhiOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.vnpzsejhhlKDqssAg1dHiMH64Ja4_bP2UPcJFgHrW3k"
+    }
+
+    response = requests.get(url, headers=headers)
+    movie_dict = json.loads(response.text)
+    movie_dict3 = json.loads(response.text)
+
+    str_titulo = movie_dict['original_title']
+    str_overview = movie_dict['overview']
+    str_premiere = movie_dict['release_date']
+    str_runtime= movie_dict['runtime']
+    str_poster = "https://image.tmdb.org/t/p/w400{}".format(movie_dict['poster_path'])
+
+    url = "https://api.themoviedb.org/3/movie/{}/credits?language=en-US".format(movie_id)
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0NmM4MjVlMDFiY2RiMWQ1NWQ4YjRmYzNiNDQ0ODFhZiIsInN1YiI6IjYwMWM1NmFkNzMxNGExMDAzZGZjMzhiOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.vnpzsejhhlKDqssAg1dHiMH64Ja4_bP2UPcJFgHrW3k"
+    }
+
+    response = requests.get(url, headers=headers)
+    movie_dict = json.loads(response.text)
+
+    int_c = 0
+    str_director = ""
+    for c in movie_dict['crew']:
+        if c['job']=='Director':
+            str_director = str_director+c['original_name']+","
+
+    str_director = str_director[:-1]
+
+    str_cast = ""
+    for c in movie_dict['cast'][0:12]:
+        str_cast = str_cast+c['original_name']+","
+
+    str_cast = str_cast[:-1]
+
+    str_tags = str_director+","+str_premiere[0:4]+","+str_cast
+
+    return render(request,'add-moviedb.html',{'str_tags':str_tags,'str_titulo':str_titulo,'str_overview':str_overview,'str_premiere':str_premiere[0:4],'str_runtime':str_runtime,'str_poster':str_poster,'str_director':str_director,'str_cast':str_cast})
+
+def savemovie(request):
+	mtitle = request.POST.get("title")
+	mpremiere = request.POST.get("premiere")
+	mruntime = request.POST.get("runtime")
+	minfo = request.POST.get("info")+"==headtext=="
+
+	tipo = Category.objects.get(pk=2)
+
+	this_item = Item.objects.create(titulo=mtitle,tipo=tipo,contenido=minfo,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31',consumido=False)
+	this_item.save()
+
+	newA = AttrInteger.objects.create(item=this_item,att_name='premiere',att_value=int(mpremiere))
+	newA.save()
+
+	newA = AttrInteger.objects.create(item=this_item,att_name='runtime',att_value=int(mruntime))
+	newA.save()
+
+
+
+	director = request.POST.get("director")
+	cast = request.POST.get("cast")
+	
+
+	for strC in request.POST.get("director","").split(","):
+		newA = AttrText.objects.create(item=this_item,att_name='Director',att_value=strC)
+		newA.save()
+		
+	for strC in request.POST.get("cast","").split(","):
+		newA = AttrText.objects.create(item=this_item,att_name='Main Cast',att_value=strC)
+		newA.save()
+
+
+
+	return redirect('/edit-item/{}'.format(this_item.id))
+
+
 

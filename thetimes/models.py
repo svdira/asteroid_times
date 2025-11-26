@@ -138,7 +138,7 @@ class Item(models.Model):
             pks = AttrImage.objects.filter(item=self,tipo='cover').values_list('pk', flat=True)
             random_pk = choice(pks)
             ppic = AttrImage.objects.get(pk=random_pk)
-            return ppic.imagen.url
+            return ppic.thumbnail_path
 
     @property
     def aplica_consumo(self):
@@ -190,7 +190,7 @@ class AttrImage(models.Model):
             thumb_path = os.path.join(os.path.dirname(img_path),
                 "thumbnails/" + os.path.basename(img_path))
             img = Image.open(img_path)
-            img.thumbnail((300, 300))  # <--- thumbnail size
+            img.thumbnail((400, 400))  # <--- thumbnail size
             img.save(thumb_path)
 
     @property

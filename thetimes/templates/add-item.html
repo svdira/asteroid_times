@@ -29,6 +29,22 @@
 </form>
 
 
+<h4>Add From TheMovieDB</h4>
+
+  <form method="POST" action="{% url 'moviedbImport' %}">
+    {% csrf_token %}
+
+
+      <label for="exampleFormControlInput1">Code</label>
+      <input type = "text" name="title" style="padding-top:0.5em;padding-bottom:0.5em;">&nbsp;
+   
+
+    <button type="submit" style="padding-top:0.5em;padding-bottom:0.5em;">Search</button>
+
+ 
+  </form><br>
+
+
 {% endblock %}
 
 

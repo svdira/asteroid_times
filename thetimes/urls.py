@@ -32,4 +32,6 @@ urlpatterns = [
 	path('gallery/<item_id>', views.gallery, name='gallery'),
 	path('photo/<photo_id>', views.photo, name='photo'),
 	path('addtweet/', views.addTweet, name='addTweet'),
+	path('moviedb-import/', views.moviedbImport, name='moviedbImport'),
+	path('save-movie/', views.savemovie, name='savemovie'),
 	]
