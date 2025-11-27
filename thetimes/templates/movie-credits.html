@@ -1,0 +1,37 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}{{nombre}} | The Times{% endblock %}
+
+{% block izquierda %}
+
+      <h2>{{nombre}}'s Movie Credits</h2><br>
+
+
+    <ul class="styled-list">
+      {% for b in this_credits %}
+      <li>
+        <span class="main-item"><a href="{% url 'item' b.item.id %}" style="text-decoration:none; color:black;">{% if b.item.consumido%}&#9989;&nbsp;{%endif%}{{b.item.titulo}} {{b.item.periodo}}</a> </span>
+      <small class="sub-item"> {{b.att_name}}</small>
+      </li>
+      {% endfor %}
+    </ul>
+
+
+
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+
+        <li class="list-group-item"><a href="{% url 'movieCredits' c.att_value %}" style="text-decoration:none; color:black;">{{c.att_value}}</a> <span class="badge badge-pill">{{c.qmovies}}</span></li>
+
+    {% endfor %}
+
+</ul>
+{% endblock %}

@@ -168,7 +168,26 @@ def item(request,i):
 		this_item.consumido = True
 		this_item.save()
 
-	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel})
+	director = False
+	main_cast = False
+	enlaces_d = ""
+	enlaces_c = ""
+
+	if this_item.tipo.category.lower() == 'movie':
+		director = AttrText.objects.filter(item=this_item,att_name='Director')
+		main_cast = AttrText.objects.filter(item=this_item,att_name='Main Cast')
+		
+		for d in director:
+			enlaces_d = enlaces_d + "<a href='/movie-credits/"+d.att_value+"' style='text-decoration:none; color:#6F8FAF;'>"+d.att_value+"</a>,&nbsp;"
+			
+		for c in main_cast:
+			enlaces_c = enlaces_c + "<a href='/movie-credits/"+c.att_value+"' style='text-decoration:none; color:#6F8FAF;'>"+c.att_value+"</a>,&nbsp;"
+
+		enlaces_d = enlaces_d[:-7]
+		enlaces_c = enlaces_c[:-7]
+
+
+	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel,'enlaces_d':enlaces_d,'enlaces_c':enlaces_c})
 
 def startConsumo(request,i):
 	this_item = Item.objects.get(pk=int(i))
@@ -644,6 +663,10 @@ def journal(request):
 		newJ.save()
 	return render(request,'journal.html',{'cats':cats,'entries':entries,'this_y':this_y,'anhos':anhos})
 
+def printedJournal(request,y):
+	entries = JournalEntry.objects.filter(fecha__year=int(y)).order_by('-fecha','-id')
+	return render(request,'print_journal_html.html',{'this_year':y,'entries':entries})
+
 def addTweet(request):
 	item = Item.objects.get(pk=int(request.POST.get("item_id")))
 	texto = request.POST.get("tweet")
@@ -738,6 +761,14 @@ def savemovie(request):
 
 
 	return redirect('/edit-item/{}'.format(this_item.id))
+
+
+def movieCredits(request,nombre):
+	this_credits = sorted(AttrText.objects.filter(att_value=nombre,item__tipo__category='Movie'),key=lambda t: t.item.periodo, reverse=True)
+	this_nombre = nombre
+	cats = AttrText.objects.filter(item__tipo__category='Movie').values('att_value').annotate(qmovies=Count('id')).order_by('-qmovies')[0:30]
+	return render(request,'movie-credits.html',{'nombre':nombre,'this_credits':this_credits,'cats':cats})
+
 
 
 

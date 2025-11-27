@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{this_year}} Journal | The Asteroid B612</title>
+</head>
+<body>
+
+<br>
+<div style="width:100%; position:relative; text-align: center;">
+		<img src="/media/assets/times_logo.png" style="width: 80%;" alt="Imagen encabezado">
+</div>
+<br>
+
+<h1>{{this_year}} Journal</h1>
+
+		{% for c in entries %}
+			<h2>{{c.item.titulo}}</h2>
+			{{c.item.mdOutput|safe}}
+		{% endfor %}
+
+</body>
+</html>

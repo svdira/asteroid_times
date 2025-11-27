@@ -13,12 +13,15 @@
        <p>Started at {{cons.fec_ini}}</p>{% endif %}
 
       {% if this_item.credit_links %}<p>By {{this_item.credit_links|safe}}</p>{% endif %}
+      {% if enlaces_d != "" %}<p>Directed by: {{enlaces_d|safe}}</p>{% endif %}
 
 
 
 
       {% if this_item.mainPic %}<img src="{{this_item.mainPic}}" style="border:1px solid grey; float:right; width:40%; margin-block-start: 1em; margin-block-end: 0em; margin-left: 16px; margin-bottom: 16px;">{% endif %}
       {{this_item.mdOutput|safe}}
+
+      {% if enlaces_c != "" %}<p>Main Cast: {{enlaces_c|safe}}</p>{% endif %}
       <div style="clear:both;"></div>
       <hr style="margin-bottom: 2em; margin-top: 1em;">
 

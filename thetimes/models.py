@@ -94,7 +94,7 @@ class Item(models.Model):
                         this_c = ""
                     enlaces = enlaces + "<a href='/item/"+str(c.item.id)+"' style='text-decoration:none; color:#6F8FAF;'>"+c.item.titulo+this_c+"</a>,&nbsp;"
 
-                clinks = enlaces = enlaces[:-7]
+                clinks = enlaces[:-7]
             else:
                 clinks = None
         else:
@@ -142,7 +142,7 @@ class Item(models.Model):
 
     @property
     def aplica_consumo(self):
-        if self.tipo.category.lower() in ['book','movie','bunko','tv series','anime','season']:
+        if self.tipo.category.lower() in ['book','movie','bunko','tv series','anime','season','manga volume']:
             return True
         else:
             return None

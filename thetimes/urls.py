@@ -34,4 +34,6 @@ urlpatterns = [
 	path('addtweet/', views.addTweet, name='addTweet'),
 	path('moviedb-import/', views.moviedbImport, name='moviedbImport'),
 	path('save-movie/', views.savemovie, name='savemovie'),
+	path('movie-credits/<nombre>', views.movieCredits, name='movieCredits'),
+	path('print-journal/<y>', views.printedJournal, name='printedJournal'),
 	]
