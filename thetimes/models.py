@@ -106,7 +106,7 @@ class Item(models.Model):
     def periodo(self):
         this_v = ''
         pubyear = 0
-        if self.tipo.category.lower() in ['book','bunko']:
+        if self.tipo.category.lower() in ['book','bunko','manga volume']:
             npubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').count()
             if npubyear > 0:
                 pubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').latest('id')

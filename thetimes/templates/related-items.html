@@ -10,7 +10,7 @@
 
   {% if tipos %}
     {% for t in tipos %}
-      <h3>{{t.cat}}</h3>
+      <h3>{{t.cat}} {% if t.cat in cats_show_ratio %}({{t.ncon}}/{{t.nitems}}){% endif %}</h3>
       <ul class="styled-list">
          {% for i in t.items %}
           <li>

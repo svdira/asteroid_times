@@ -161,6 +161,14 @@ def item(request,i):
 
 	tweets = Tweet.objects.filter(item=this_item)
 
+	tipos = []
+	cats_show_ratio = ['Book', 'Bunko', 'Manga Volume', 'Season', 'Anime']
+	categories = AttrItem.objects.filter(item=this_item).values_list('child__tipo__category', flat=True).distinct()
+	for cat in categories:
+		items_cat = sorted(AttrItem.objects.filter(item=this_item, child__tipo__category=cat),  key=lambda t: t.child.periodo, reverse=False)
+		consumidos = sum(1 for t in items_cat if t.item.consumido == 1)
+		tipos.append({'cat':cat,'items':items_cat,'nitems':len(items_cat),'ncon':consumidos})
+
 	if request.method == 'POST':
 		con_in_prog.fec_fin = request.POST.get("fec_fin")
 		con_in_prog.save()
@@ -176,10 +184,10 @@ def item(request,i):
 	if this_item.tipo.category.lower() == 'movie':
 		director = AttrText.objects.filter(item=this_item,att_name='Director')
 		main_cast = AttrText.objects.filter(item=this_item,att_name='Main Cast')
-		
+
 		for d in director:
 			enlaces_d = enlaces_d + "<a href='/movie-credits/"+d.att_value+"' style='text-decoration:none; color:#6F8FAF;'>"+d.att_value+"</a>,&nbsp;"
-			
+
 		for c in main_cast:
 			enlaces_c = enlaces_c + "<a href='/movie-credits/"+c.att_value+"' style='text-decoration:none; color:#6F8FAF;'>"+c.att_value+"</a>,&nbsp;"
 
@@ -187,7 +195,7 @@ def item(request,i):
 		enlaces_c = enlaces_c[:-7]
 
 
-	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel,'enlaces_d':enlaces_d,'enlaces_c':enlaces_c})
+	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel,'enlaces_d':enlaces_d,'enlaces_c':enlaces_c,'tipos':tipos,'cats_show_ratio':cats_show_ratio})
 
 def startConsumo(request,i):
 	this_item = Item.objects.get(pk=int(i))
@@ -244,6 +252,11 @@ def startConsumo(request,i):
 
 def bookHistory(request):
 	get_y = request.GET.get('y', 1)
+
+	conteo_0 = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).count()
+	if conteo_0 == 0:
+	    return redirect('/book-queue/')
+
 	max_year = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).order_by('-fec_fin').first()
 
 	this_y = max_year.fec_fin.year if int(get_y) == 1 else int(get_y)
@@ -266,6 +279,9 @@ def bookHistory(request):
 
 def movieHistory(request):
 	get_y = request.GET.get('y', 1)
+	conteo_0 = Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False).count()
+	if conteo_0 == 0:
+	    return redirect('/movie-queue/')
 	max_year = Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False).order_by('-fec_fin').first()
 
 	this_y = max_year.fec_fin.year if int(get_y) == 1 else int(get_y)
@@ -307,14 +323,16 @@ def relatedItems(request,item):
 	this_item = Item.objects.get(pk=int(item))
 
 	tipos = []
+	cats_show_ratio = ['Book', 'Bunko', 'Manga Volume', 'Season', 'Anime']
 	categories = AttrItem.objects.filter(item=this_item).values_list('child__tipo__category', flat=True).distinct()
 	for cat in categories:
 		items_cat = sorted(AttrItem.objects.filter(item=this_item, child__tipo__category=cat),  key=lambda t: t.child.periodo, reverse=False)
-		tipos.append({'cat':cat,'items':items_cat})
+		consumidos = sum(1 for t in items_cat if t.item.consumido == 1)
+		tipos.append({'cat':cat,'items':items_cat,'nitems':len(items_cat),'ncon':consumidos})
 
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 
-	return render(request,'related-items.html',{'this_item':this_item,'tipos':tipos,'cats':cats})
+	return render(request,'related-items.html',{'this_item':this_item,'tipos':tipos,'cats':cats,'cats_show_ratio':cats_show_ratio})
 
 def addChildItem(request, parent):
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
@@ -748,12 +766,12 @@ def savemovie(request):
 
 	director = request.POST.get("director")
 	cast = request.POST.get("cast")
-	
+
 
 	for strC in request.POST.get("director","").split(","):
 		newA = AttrText.objects.create(item=this_item,att_name='Director',att_value=strC)
 		newA.save()
-		
+
 	for strC in request.POST.get("cast","").split(","):
 		newA = AttrText.objects.create(item=this_item,att_name='Main Cast',att_value=strC)
 		newA.save()
