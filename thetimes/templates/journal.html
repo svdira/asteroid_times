@@ -20,7 +20,7 @@
 </form>
 
 <br>
-<h2>Journal {{this_y}} <a href="{% url 'printedJournal' this_y %}" style="text-decoration:none;" target="_blank">&#128438;</a>{% if anhos %}{% for a in anhos%} | <a href="{% url 'journal' %}?y={{a.fecha__year}}" style="text-decoration:none; color:blue;">{{a.fecha__year}} ({{a.qbooks}})</a> <a href="{% url 'printedJournal' a.fecha__year %}" style="text-decoration:none;" target="_blank">&#128438;</a>{% endfor %}{% endif %}</h2>
+<h2>Journal {{this_y}} <a href="{% url 'printedJournal' this_y %}" style="text-decoration:none;" target="_blank">&#128424;</a>{% if anhos %}{% for a in anhos%} | <a href="{% url 'journal' %}?y={{a.fecha__year}}" style="text-decoration:none; color:blue;">{{a.fecha__year}} ({{a.qbooks}})</a> <a href="{% url 'printedJournal' a.fecha__year %}" style="text-decoration:none;" target="_blank">&#128424;</a>{% endfor %}{% endif %}</h2>
 <hr>
 
 {% if entries %}

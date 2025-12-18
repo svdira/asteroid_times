@@ -9,6 +9,7 @@ from django.db.models import F
 from django.db.models.functions import Round
 from django.db.models.functions import Cast
 from datetime import datetime
+from datetime import date
 import math
 import random
 import re
@@ -29,7 +30,7 @@ def addItem(request):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime','tv series','season']:
+		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime','tv series','season','persona','album','band']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
 		    newI.save()
 		else:
@@ -69,6 +70,9 @@ def editItem(request,i):
 
 			newRel = AttrItem.objects.create(item=parent,child=this_item,rel_name=relacion)
 			newRel.save()
+
+			if request.POST.get("relacion")=='lista-item':
+			    return redirect(f"/item/{request.POST.get('lista')}")
 		if request.POST.get("formulario")=='4':
 			if len(request.FILES.get("imagen"))>2:
 				photo = request.FILES.get("imagen")
@@ -158,6 +162,8 @@ def item(request,i):
 		con_in_prog = None
 
 	conteo_rel = AttrItem.objects.filter(item=this_item).count()
+	conteo_pars = AttrItem.objects.filter(child=this_item).count()
+	parents = AttrItem.objects.filter(child=this_item).order_by('item__titulo')
 
 	tweets = Tweet.objects.filter(item=this_item)
 
@@ -165,16 +171,37 @@ def item(request,i):
 	cats_show_ratio = ['Book', 'Bunko', 'Manga Volume', 'Season', 'Anime']
 	categories = AttrItem.objects.filter(item=this_item).values_list('child__tipo__category', flat=True).distinct()
 	for cat in categories:
-		items_cat = sorted(AttrItem.objects.filter(item=this_item, child__tipo__category=cat),  key=lambda t: t.child.periodo, reverse=False)
-		consumidos = sum(1 for t in items_cat if t.item.consumido == 1)
+		if this_item.tipo.category.lower() != 'book list':
+		    items_cat = sorted(AttrItem.objects.filter(item=this_item, child__tipo__category=cat),  key=lambda t: t.child.periodo, reverse=False)
+		else:
+		    items_cat = AttrItem.objects.filter(item=this_item, child__tipo__category=cat).order_by('id')
+		consumidos = sum(1 for t in items_cat if t.child.consumido == True)
 		tipos.append({'cat':cat,'items':items_cat,'nitems':len(items_cat),'ncon':consumidos})
 
 	if request.method == 'POST':
+		conteo_pb = BarraProgreso.objects.filter(consumo=con_in_prog).count()
+		anterior = 0
+
+		if conteo_pb > 0:
+			last_barra = BarraProgreso.objects.filter(consumo=con_in_prog).latest('id')
+			anterior = last_barra.progreso
+
+		newB = BarraProgreso.objects.create(consumo=con_in_prog, 
+			fecha=request.POST.get("fec_fin"),
+			progreso=con_in_prog.cantidad,
+			anterior=anterior )
+		newB.save()
+
 		con_in_prog.fec_fin = request.POST.get("fec_fin")
 		con_in_prog.save()
 		this_item.fecha_creacion = request.POST.get("fec_fin")
 		this_item.consumido = True
 		this_item.save()
+
+
+
+
+		con_in_prog = None
 
 	director = False
 	main_cast = False
@@ -195,23 +222,38 @@ def item(request,i):
 		enlaces_c = enlaces_c[:-7]
 
 
-	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel,'enlaces_d':enlaces_d,'enlaces_c':enlaces_c,'tipos':tipos,'cats_show_ratio':cats_show_ratio})
+	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel,'conteo_p':conteo_pars,'parents':parents,'enlaces_d':enlaces_d,'enlaces_c':enlaces_c,'tipos':tipos,'cats_show_ratio':cats_show_ratio})
 
 def startConsumo(request,i):
 	this_item = Item.objects.get(pk=int(i))
+
+	duracion = 0
+
+	if AttrInteger.objects.filter(item=this_item, att_name='runtime').count() > 0:
+
+		obj_duracion = AttrInteger.objects.filter(item=this_item, att_name='runtime').latest('id')
+		duracion = obj_duracion.att_value
+
 
 	if this_item.tipo.category.lower() in ['book','bunko','manga volume','comic book']:
 		formatos = ['printed','kindle','audiobook']
 		units = ['paginas','minutos','location']
 
-	if this_item.tipo.category.lower() in ['movie','anime','tv series','season']:
-		formatos = ['streaming','download','theater']
-		units = ['minutes','episodes']
+	if this_item.tipo.category.lower() in ['movie','album']:
+		formatos = ['streaming','download','theater','cd/dvd/lp']
+		units = ['minutes']
+
+	if this_item.tipo.category.lower() in ['anime','tv series','season']:
+		formatos = ['streaming','download','theater','cd/dvd/lp']
+		units = ['episodes']
 
 
 	if request.method == 'POST':
 		fec_ini = request.POST.get("fec_ini")
-		fec_fin = request.POST.get("fec_fin","no")
+		if this_item.tipo.category.lower() in ['movie','album']:
+		    fec_fin = fec_ini
+		else:
+		    fec_fin = request.POST.get("fec_fin","no")
 		formato = request.POST.get("formato")
 		unidades = request.POST.get("unidades")
 		cantidad = request.POST.get("cantidad")
@@ -247,7 +289,7 @@ def startConsumo(request,i):
 		return redirect(f"/item/{this_item.id}")
 
 
-	return render(request,'start_consumo.html',{'this_item':this_item,'formatos':formatos,'units':units})
+	return render(request,'start_consumo.html',{'this_item':this_item,'formatos':formatos,'units':units,'duracion':duracion})
 
 
 def bookHistory(request):
@@ -327,7 +369,7 @@ def relatedItems(request,item):
 	categories = AttrItem.objects.filter(item=this_item).values_list('child__tipo__category', flat=True).distinct()
 	for cat in categories:
 		items_cat = sorted(AttrItem.objects.filter(item=this_item, child__tipo__category=cat),  key=lambda t: t.child.periodo, reverse=False)
-		consumidos = sum(1 for t in items_cat if t.item.consumido == 1)
+		consumidos = sum(1 for t in items_cat if t.child.consumido == 1)
 		tipos.append({'cat':cat,'items':items_cat,'nitems':len(items_cat),'ncon':consumidos})
 
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
@@ -345,7 +387,7 @@ def addChildItem(request, parent):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime','tv series','season']:
+		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime','tv series','season','persona','band','album']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
 		    newI.save()
 		else:
@@ -363,16 +405,18 @@ def addChildItem(request, parent):
 def searchPage(request):
 	results = None
 	results_2 = None
+	lista = None
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 
 	if request.method == 'POST':
+		lista = request.POST.get("parent")
 		key_word = request.POST.get("key_word")
 		results = Item.objects.filter(titulo__contains=key_word)
 		ids =  Item.objects.filter(titulo__contains=key_word).values_list('id', flat=True)
 		ids_list = list(ids)
 		results_2 = Item.objects.filter(contenido__contains=key_word).exclude(id__in=ids_list)
 
-	return render(request,'search-page.html',{'cats':cats,'rt':results,'rc':results_2})
+	return render(request,'search-page.html',{'cats':cats,'rt':results,'rc':results_2,'lista':lista})
 
 def printHTML(request, cid):
 	this_item = Item.objects.get(pk=int(cid))
@@ -786,6 +830,28 @@ def movieCredits(request,nombre):
 	this_nombre = nombre
 	cats = AttrText.objects.filter(item__tipo__category='Movie').values('att_value').annotate(qmovies=Count('id')).order_by('-qmovies')[0:30]
 	return render(request,'movie-credits.html',{'nombre':nombre,'this_credits':this_credits,'cats':cats})
+
+def regProgress(request):
+	con_id = int(request.POST.get("con_id"))
+	consumo = Consumo.objects.get(pk=con_id)
+	conteo = BarraProgreso.objects.filter(consumo=consumo).count()
+	progreso = int(request.POST.get("progreso"))
+	anterior = 0
+
+
+
+	if conteo > 0:
+		last_barra = BarraProgreso.objects.filter(consumo=consumo).latest('id')
+		anterior = last_barra.progreso
+
+	if progreso <= consumo.cantidad and progreso > anterior:
+		newB = BarraProgreso.objects.create(consumo=consumo, fecha = date.today(),	progreso = progreso,anterior = anterior)
+		newB.save()
+
+	return redirect(f"/item/{consumo.item.id}")
+
+
+
 
 
 

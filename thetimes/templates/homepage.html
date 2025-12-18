@@ -10,7 +10,7 @@
   <br>
   <ul class="list-group">
     {% for i in in_progress %}
-      <li class="list-group-item"><a href="{% url 'item' i.item.id %}" style="text-decoration:none; color:black;"><span style="color:gray">{{i.fec_ini|date:"M/j"}}</span> | {{i.item.tipo.category|capfirst}} | {{i.item.titulo}}{% if i.item.periodo %}&nbsp;{{i.item.periodo}}{% endif %} </a></li>
+      <li class="list-group-item"><a href="{% url 'item' i.item.id %}" style="text-decoration:none; color:black;"><span style="color:gray">{{i.fec_ini|date:"M/j"}}</span> | {{i.item.tipo.category|capfirst}} | {{i.item.titulo}}{% if i.item.periodo %}&nbsp;{{i.item.periodo}}{% endif %} {{i.progreso.por}}</a></li>
     {% endfor%}
   </ul>
   <br>

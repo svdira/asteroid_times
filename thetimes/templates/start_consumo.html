@@ -28,7 +28,7 @@
           {% endfor %}
         </select><br><br>
         <label>Quantity:</label><br>
-        <input type="text" name="cantidad" style="padding:0.4em;"><br><br>
+        <input type="text" name="cantidad" style="padding:0.4em;" {% if duracion > 0 %}value="{{duracion}}"{% endif %}><br><br>
         <label>Multiplicator (Avg Duration):</label><br>
         <input type="text" name="multiplicador" value="1" style="padding:0.4em;"><br><br>
         <input type="submit" value="Start Consumo">

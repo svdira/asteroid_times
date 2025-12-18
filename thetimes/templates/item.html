@@ -5,12 +5,44 @@
 
 {% block izquierda %}
 
-      <h2>{% if this_item.consumido%}&#9989;&nbsp;{%endif%}{{this_item.titulo}}{% if this_item.periodo %}&nbsp;{{this_item.periodo}}{% endif %}<a href="{% url 'editItem' this_item.id %}" style="text-decoration:none; color:grey;">&#x1F4DD;</a>{% if conteo_r > 0 %} <a href="{% url 'printHTML' this_item.id %}" target="_blank" style="text-decoration:none; color:grey;">&#128438;</a>{% endif %}</h2>
+      <h2>{% if this_item.consumido%}&#9989;&nbsp;{%endif%}{{this_item.titulo}}{% if this_item.periodo %}&nbsp;{{this_item.periodo}}{% endif %}<a href="{% url 'editItem' this_item.id %}" style="text-decoration:none; color:grey;">&#x1F4DD;</a>{% if conteo_r > 0 %} <a href="{% url 'printHTML' this_item.id %}" target="_blank" style="text-decoration:none; color:grey;">&#128424;</a>{% endif %}</h2>
+
+      {% if this_item.tipo.category == 'Book List' %}
+                <br>
+               {% if tipos %}
+                {% for t in tipos %}
+                <h3>Progress: {{t.ncon}}/{{t.nitems}}</h3>
+                  <ul class="styled-list">
+                     {% for i in t.items %}
+                      <li>
+                        <span class="main-item"><a href="{% url 'item' i.child.id %}" style="text-decoration:none; color:black;">{% if i.child.consumido%}&#9989;&nbsp;{%endif%}{{i.child.titulo}}{% if i.child.periodo %}&nbsp;{{i.child.periodo}}{% endif %}</a></span>
+                        <small class="sub-item">{{i.child.credit_links|safe}}</small>
+                      </li>
+                    {% endfor %}
+                  </ul>
+        {% endfor %}
+      {% endif %}
+
+      <h3>Search Books</h3>
+        <form method='POST' action="{% url 'searchPage' %}">
+            {% csrf_token %}
+            <input type="text" name="key_word"  style="width:100%; padding-top:0.5em;padding-bottom:0.5em;"><br><br>
+            <input type = 'hidden' name='parent' value='{{this_item.id}}'>
+            <input type="submit" value="Search"  style="padding-top:0.5em;padding-bottom:0.5em;">
+          </form>
+
+      {% else %}
+
       <p><span class="detalles">{{this_item.tipo.category|capfirst}}{% if this_item.fecha_creacion|date:"Y-m-d" > '1999-12-31' %} | {{this_item.fecha_creacion|date:"M j, Y"}}{% endif %}{% if this_item.aplica_consumo %} | <a href="{% url 'startConsumo' this_item.id %}" style="text-decoration:none; color:grey;">Start</a>{% endif %} | <a href="{% url 'addChildItem' this_item.id %}"  style="text-decoration:none; color:grey;">Add Child</a>{% if this_item.conteo_imgs > 0 %} | <a href="{% url 'gallery' this_item.id %}"  style="text-decoration:none; color:grey;">Gallery</a>{% endif %}</span></p>
 
        {% if cons %}<form method='POST' style='font-size: 1.2em; text-indent:1.4em;  font-family:  "Claris","Georgia", serif;'>{% csrf_token %}<label>FDate:</label>&nbsp;<input type="text" name="fec_fin" style="width:6em;"  id="datepicker" placeholder="Select date">&nbsp;<input type="submit" value="Finish"></form>
 
-       <p>Started at {{cons.fec_ini}}</p>{% endif %}
+       <form method="POST" action="{% url 'regProgress' %}"  style='font-size: 1.2em; text-indent:1.4em;  font-family:  "Claris","Georgia", serif;'>{% csrf_token %}<label>Log:</label>&nbsp;<input type="text" name="progreso" style="width:3em;"> {{cons.unidades}}&nbsp;<input type="hidden" name="con_id" value="{{cons.id}}"><input type="submit" value="Save">
+        {% csrf_token %}
+
+       </form>
+
+       <p>Started at {{cons.fec_ini}} {{cons.progreso.por}}</p>{% endif %}
 
       {% if this_item.credit_links %}<p>By {{this_item.credit_links|safe}}</p>{% endif %}
       {% if enlaces_d != "" %}<p>Directed by: {{enlaces_d|safe}}</p>{% endif %}
@@ -38,6 +70,13 @@
         {% endfor %}
       {% endif %}
 
+      {% if conteo_p > 0 %}
+
+        <h4>Part of this items:</h4>
+        <p>{% for p in parents %}{% if forloop.last %}<a href="{% url 'item' p.item.id %}" style="text-decoration:none; color:#6F8FAF;">{{p.item.titulo}}</a>{%else%}<a href="{% url 'item' p.item.id %}" style="text-decoration:none; color:#6F8FAF;">{{p.item.titulo}}</a>, {% endif %}{% endfor %} </p>
+
+      {% endif %}
+
       <h4>Add Comments:</h4>
       <div style="width: 95%;">
         <form style="width: 100%;"  method = 'POST' action="{% url 'addTweet' %}">
@@ -56,6 +95,8 @@
           <p style="font-family: Calibri,Arial,sans-serif; font-size: 1.1em;">{{t.ttext}}<br><span style="text-align:right; color: grey; "><i>{{t.ttime|date:"M j, Y"}}</i></span></p>
         </div>
         {% endfor %}
+      {% endif %}
+
       {% endif %}
 
 

@@ -80,15 +80,15 @@ class Item(models.Model):
     @property
     def credit_links(self):
 
-        if self.tipo.category.lower() in  ['book','movie']:
-            ncreds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym','director']).count()
+        if self.tipo.category.lower() in  ['book','movie','album']:
+            ncreds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym','director','Artist','artist']).count()
             if ncreds > 0:
-                creds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym','director'])
+                creds = AttrItem.objects.filter(child=self, rel_name__in=['author','illustratror','pseudonym','director','Artist','artist'])
 
                 enlaces = ""
 
                 for c in creds:
-                    if c.rel_name not in  ['author','director']:
+                    if c.rel_name not in  ['author','director','artist','Artist']:
                         this_c = "(" + c.credito +")"
                     else:
                         this_c = ""
@@ -111,7 +111,7 @@ class Item(models.Model):
             if npubyear > 0:
                 pubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').latest('id')
                 this_v = f"({pubyear.att_value})"
-        if self.tipo.category.lower() in ['movie','season','tv series','anime']:
+        if self.tipo.category.lower() in ['movie','season','tv series','anime','album']:
             npubyear = AttrInteger.objects.filter(item=self,att_name='premiere').count()
             nfin = AttrInteger.objects.filter(item=self,att_name='finale').count()
             if npubyear > 0:
@@ -142,7 +142,7 @@ class Item(models.Model):
 
     @property
     def aplica_consumo(self):
-        if self.tipo.category.lower() in ['book','movie','bunko','tv series','anime','season','manga volume']:
+        if self.tipo.category.lower() in ['book','movie','bunko','anime','season','manga volume','album']:
             return True
         else:
             return None
@@ -167,6 +167,30 @@ class Consumo(models.Model):
 
     def __str__(self):
         return self.item.titulo
+
+    @property
+    def progreso(self):
+        avance = {'p':0,'t':self.cantidad,'por':f'| {0}/{self.cantidad} (0%)'}
+        conteo = BarraProgreso.objects.filter(consumo=self).count()
+        if conteo > 0:
+            last_barra = BarraProgreso.objects.filter(consumo=self).latest('id')
+            avance = {'p':last_barra.progreso,'t':self.cantidad,'por':f'| {last_barra.progreso}/{self.cantidad} ('+str(round(100*last_barra.progreso/self.cantidad,1))+"%)"}
+
+        return avance
+
+
+
+
+class BarraProgreso(models.Model):
+    consumo = models.ForeignKey(Consumo, on_delete=models.CASCADE)
+    fecha = models.DateField()
+    progreso = models.IntegerField()
+    anterior = models.IntegerField()
+
+    def __str__(self):
+        return self.consumo.item.titulo
+
+
 
 class AttrItem(models.Model):
     item = models.ForeignKey(Item,on_delete=models.CASCADE,related_name="parent_item")

@@ -9,40 +9,68 @@
   <form method='POST'>
     {% csrf_token %}
     <input type="text" name="key_word"  style="width:100%; padding-top:0.5em;padding-bottom:0.5em;"><br><br>
+    <input type = 'hidden' name='parent' value='NoParent'>
     <input type="submit" value="Search"  style="padding-top:0.5em;padding-bottom:0.5em;">
   </form>
 
+{% if lista == 'NoParent' %}
 
-
-   {% if rt or rc %}
+   {% if rt %}
    <br>
 
-  <h2>Search Results:</h2>
+         <h2>Search Results:</h2>
 
-   <hr>
-    {% for a in rt %}
-      <h2><a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
-      <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}}{% if a.nrelated > 0 %} | <a href="{% url 'relatedItems' a.id %}" style="text-decoration:none; color:grey;">Related ({{a.nrelated}})</a>{% endif %}</span></p>
 
-      {% if a.credit_links %}<p>By {{a.credit_links|safe}}</p>{% endif %}
 
-      {{a.headtext|safe}}
-      <div style="clear:both;"></div>
-      <hr style="margin-bottom: 2em; margin-top: 1em;">
-    {% endfor %}
-  {% endif %}
+           <hr>
+            {% for a in rt %}
+              <h2><a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
+              <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}}{% if a.nrelated > 0 %} | <a href="{% url 'relatedItems' a.id %}" style="text-decoration:none; color:grey;">Related ({{a.nrelated}})</a>{% endif %}</span></p>
 
-   {% if rc %}
-    {% for a in rc %}
-      <h2><a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
-      <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}}{% if a.nrelated > 0 %} | <a href="{% url 'relatedItems' a.id %}" style="text-decoration:none; color:grey;">Related ({{a.nrelated}})</a>{% endif %}</span></p>
+              {% if a.credit_links %}<p>By {{a.credit_links|safe}}</p>{% endif %}
 
-      {% if a.credit_links %}<p>By {{a.credit_links|safe}}</p>{% endif %}
+              {{a.headtext|safe}}
+              <div style="clear:both;"></div>
+              <hr style="margin-bottom: 2em; margin-top: 1em;">
+            {% endfor %}
+          {% endif %}
 
-      {{a.headtext|safe}}
-      <div style="clear:both;"></div>
-      <hr style="margin-bottom: 2em; margin-top: 1em;">
-    {% endfor %}
+           {% if rc %}
+            {% for a in rc %}
+              <h2><a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
+              <p><span class="detalles">{{a.tipo.category|capfirst}} | {{a.fecha_creacion|date:"M j, Y"}}{% if a.nrelated > 0 %} | <a href="{% url 'relatedItems' a.id %}" style="text-decoration:none; color:grey;">Related ({{a.nrelated}})</a>{% endif %}</span></p>
+
+              {% if a.credit_links %}<p>By {{a.credit_links|safe}}</p>{% endif %}
+
+              {{a.headtext|safe}}
+              <div style="clear:both;"></div>
+              <hr style="margin-bottom: 2em; margin-top: 1em;">
+            {% endfor %}
+          {% endif %}
+  {% else %}
+
+    <h2>Search Results:</h2>
+    <hr>
+        {% if rt %}
+         {% for a in rt %}
+            {% if a.credit_links %}<p> {{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %} | By {{a.credit_links|safe}}
+
+            <form method="POST" action="/edit-item/{{a.id}}">  {% csrf_token %}
+                <input type='hidden' name="item_id" value='{{lista}}'>
+                <input type="hidden" name="relacion" value="lista-item">
+                <input type="hidden" name="lista" value="{{lista}}">
+                <input type="submit" value="Add to  List">
+                <input type="hidden" name="formulario" value="3">
+            </form>
+
+
+            </p>{% endif %}
+
+
+              <div style="clear:both;"></div>
+              <hr style="margin-bottom: 2em; margin-top: 1em;">
+            {% endfor %}
+          {% endif %}
   {% endif %}
 
 

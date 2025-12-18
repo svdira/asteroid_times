@@ -36,4 +36,5 @@ urlpatterns = [
 	path('save-movie/', views.savemovie, name='savemovie'),
 	path('movie-credits/<nombre>', views.movieCredits, name='movieCredits'),
 	path('print-journal/<y>', views.printedJournal, name='printedJournal'),
+	path('reg-progress/', views.regProgress, name='regProgress'),
 	]
