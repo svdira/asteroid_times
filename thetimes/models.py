@@ -170,11 +170,11 @@ class Consumo(models.Model):
 
     @property
     def progreso(self):
-        avance = {'p':0,'t':self.cantidad,'por':f'| {0}/{self.cantidad} (0%)'}
+        avance = {'p':0,'t':self.cantidad,'por':f'| {0}/{self.cantidad} (0%)','ancho':'0'}
         conteo = BarraProgreso.objects.filter(consumo=self).count()
         if conteo > 0:
             last_barra = BarraProgreso.objects.filter(consumo=self).latest('id')
-            avance = {'p':last_barra.progreso,'t':self.cantidad,'por':f'| {last_barra.progreso}/{self.cantidad} ('+str(round(100*last_barra.progreso/self.cantidad,1))+"%)"}
+            avance = {'p':last_barra.progreso,'t':self.cantidad,'por':f'| {last_barra.progreso}/{self.cantidad} ('+str(round(100*last_barra.progreso/self.cantidad,1))+"%)",'ancho':str(round(100*last_barra.progreso/self.cantidad,1))}
 
         return avance
 
