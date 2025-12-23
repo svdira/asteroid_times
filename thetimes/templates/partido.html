@@ -6,19 +6,27 @@
 {% block izquierda %}
 
 
-<h2>{{this_partido.headline}}</h2>
-<p><span class="detalles">LineUps: <a href="{% url 'alineacion' this_partido.id this_partido.local.id %}"  style="text-decoration:none; color:grey;">{{this_partido.local.nombre}}</a> | <a href="{% url 'alineacion' this_partido.id this_partido.visita.id %}"  style="text-decoration:none; color:grey;">{{this_partido.visita.nombre}} </a></span></p>
+
+
+
+
+
+
+
 
 {% if this_partido.terminado == False %}
+
+<h2>{{this_partido.headline}}</h2>
+
 <form method="POST">
   {% csrf_token %}
   <table>
     <tr>
       <td>{{this_partido.local.nombre}}</td>
       <td><input type="text" name="marcador" style="width:6em; text-align: center; padding-top:0.5em;padding-bottom:0.5em;"></td>
-  
+
       <td>{{this_partido.visita.nombre}}</td>
-     
+
     </tr>
     <tr>
       <td colspan="3" style="text-align: center;"><input type="submit" value="Save"></td>
@@ -27,12 +35,36 @@
 </form>
 {% else %}
 
+<div class="match-card">
+  <div class="match-meta">
+    <span class="match-date">{{this_partido.fecha}}</span>
+    <span class="match-league">{{this_partido.torneo.nombre}}</span>
+  </div>
+
+  <div class="match-body">
+    <div class="team home">
+      <span class="team-name">{{this_partido.local.nombre}}</span>
+    </div>
+
+    <div class="score">
+      <span class="goals">{{this_partido.goles_local}}</span>
+      <span class="divider">–</span>
+      <span class="goals">{{this_partido.goles_visita}}</span>
+    </div>
+
+    <div class="team away">
+      <span class="team-name">{{this_partido.visita.nombre}}</span>
+    </div>
+  </div>
+</div>
+
 {% if goles %}
+<br>
   {% for g in goles %}
     ({{g.contrato.equipo.nombre_corto}}) {{g.contrato.jugador.nombre}} {{g.minuto}}'{% if g.adicional > 0%}+{{g.adicional}}{%endif%}{% if g.penalty == True %} P{%endif%}<br>
   {% endfor %}
 {% endif %}
-  
+
    {% if contratos_l and this_partido.goles_local > 0 and this_partido.goles_local > this_partido.gl %}
 
 
@@ -71,6 +103,10 @@
 {% endif %}
 
 
+<p><span class="detalles">LineUps: <a href="{% url 'alineacion' this_partido.id this_partido.local.id %}"  style="text-decoration:none; color:grey;">{{this_partido.local.nombre}}</a> | <a href="{% url 'alineacion' this_partido.id this_partido.visita.id %}"  style="text-decoration:none; color:grey;">{{this_partido.visita.nombre}} </a></span></p>
+
+
+
 {% if next_m %}
 <br><br>
 
@@ -100,10 +136,10 @@
 
 <ul class="list-group">
     {% for c in ligas %}
-    
+
 
         <li class="list-group-item"><a href="{% url 'liga' c.id %}" style="text-decoration:none; color:black;">{{c.nombre}}</a> <span class="badge badge-pill">{{c.npartidos}}</span></li>
-      
+
     {% endfor %}
 
 </ul>

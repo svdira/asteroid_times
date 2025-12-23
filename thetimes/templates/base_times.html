@@ -322,7 +322,7 @@
       gap: 1rem;
       padding: 1rem;
       grid-template-columns: 1fr;
-      
+
     }
 
 
@@ -343,7 +343,7 @@
       }
 
       .image-grid {
-        
+
         grid-template-columns: repeat(3, 1fr);
       }
 
@@ -446,6 +446,90 @@ table thead tr:first-child th:first-child {
 table thead tr:first-child th:last-child {
   border-top-right-radius: 12px;
 }
+
+
+.match-card {
+  max-width: 420px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.match-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Top info */
+.match-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.match-league {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Match row */
+.match-body {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.team {
+  display: flex;
+}
+
+.team.home {
+  justify-content: flex-end;
+}
+
+.team.away {
+  justify-content: flex-start;
+}
+
+.team-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #222;
+  text-align: center;
+}
+
+/* Score */
+.score {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #111;
+}
+
+.divider {
+  font-weight: 400;
+  color: #888;
+}
+
+/* Responsive */
+@media (max-width: 360px) {
+  .team-name {
+    font-size: 0.9rem;
+  }
+
+  .score {
+    font-size: 1.1rem;
+  }
+}
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -458,7 +542,7 @@ table thead tr:first-child th:last-child {
 
     <!-- Fecha centrada -->
     <div class="fecha">
-      {% block cinta %}<a href="{% url 'searchPage' %}" style="text-decoration:none; color:grey;">Search</a> | <a href="{% url 'bookHistory' %}" style="text-decoration:none; color:grey;">Books</a> | <a href="{% url 'movieHistory' %}" style="text-decoration:none; color:grey;">Movies</a> | <a href="{% url 'futbol' 0 %}" style="text-decoration:none; color:grey;">Fútbol</a> | <a href="{% url 'journal' %}" style="text-decoration:none; color:grey;">Journal</a> | <a href="{% url 'addItem' %}" style="text-decoration:none; color:grey;">Add Item</a>{% endblock %}
+      {% block cinta %}<a href="{% url 'searchPage' %}" style="text-decoration:none; color:grey;">Search</a> | <a href="{% url 'bookHistory' %}" style="text-decoration:none; color:grey;">Books</a> | <a href="{% url 'movieHistory' %}" style="text-decoration:none; color:grey;">Movies</a> | <a href="{% url 'futbol' 0 %}" style="text-decoration:none; color:grey;">Fútbol</a> | <a href="{% url 'journal' %}" style="text-decoration:none; color:grey;">Journal</a> | <a href="{% url 'addItem' %}" style="text-decoration:none; color:grey;">Add</a>{% endblock %}
     </div>
 
     <div class="contenido">
