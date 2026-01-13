@@ -111,7 +111,7 @@ def editItem(request,i):
 
 def homepage(request):
 	page = request.GET.get('page', 1)
-	articles = Item.objects.exclude(tipo__id=14).order_by('-fecha_creacion')
+	articles = Item.objects.exclude(tipo__id__in=[14,22,6]).order_by('-fecha_creacion')
 	paginator = Paginator(articles, 12)
 	resultados = paginator.get_page(page)
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
@@ -186,7 +186,7 @@ def item(request,i):
 			last_barra = BarraProgreso.objects.filter(consumo=con_in_prog).latest('id')
 			anterior = last_barra.progreso
 
-		newB = BarraProgreso.objects.create(consumo=con_in_prog, 
+		newB = BarraProgreso.objects.create(consumo=con_in_prog,
 			fecha=request.POST.get("fec_fin"),
 			progreso=con_in_prog.cantidad,
 			anterior=anterior )
@@ -236,8 +236,8 @@ def startConsumo(request,i):
 
 
 	if this_item.tipo.category.lower() in ['book','bunko','manga volume','comic book']:
-		formatos = ['printed','kindle','audiobook']
-		units = ['paginas','minutos','location']
+		formatos = ['printed','kindle','boox','audiobook']
+		units = ['paginas','location','minutos']
 
 	if this_item.tipo.category.lower() in ['movie','album']:
 		formatos = ['streaming','download','theater','cd/dvd/lp']
