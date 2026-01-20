@@ -20,6 +20,8 @@ admin.site.register(RelTorneoEquipo)
 admin.site.register(JournalEntry)
 admin.site.register(Tweet)
 admin.site.register(BarraProgreso)
+admin.site.register(Atributos)
+
 
 
 

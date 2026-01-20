@@ -1,0 +1,55 @@
+{% extends 'base_wiki.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<div class="form-card">
+
+
+	<h2><a href='/edit-item/{{this_item.id}}?wiki={{this_wiki.id}}' style='text-decoration: none; color: #007bff;'>{{this_item.titulo}}</a></h2>
+
+	<p style="font-family:Arial,Helvetica,sans-serif;"><a href="{% url 'wiki' this_wiki.id %}" style="text-decoration: none; color:grey;">{{this_wiki.titulo}}</a></p>
+	
+
+
+
+	 {% if this_item.mainPic or atributos %}
+
+	 <div class="tech-details">
+	    <div class="tech-title">{{this_item.titulo}}</div>
+
+	    <dl>
+	    	{% if this_item.mainPic %}
+	    	<dd><img src="{{this_item.mainPic}}" style="width: 100%;"></dd>
+	    	{% endif %}
+
+	    	{% if atributos%}
+	    		{% for a in atributos %}
+	    			<dt>{{a.nombre}}</dt>
+	    			{% if a.tipo == 'fec' %}
+	    			<dd>{{a.fecha}}</dd>
+	    			{% endif %}
+	    			{% if a.tipo == 'int' %}
+	    			<dd>{{a.entero}}</dd>
+	    			{% endif %}
+	    			{% if a.tipo == 'txt' %}
+	    			<dd>{{a.texto}}</dd>
+	    			{% endif %}
+	    			{% if a.tipo == 'dec' %}
+	    			<dd>{{a.decimal}}</dd>
+	    			{% endif %}
+	    		{% endfor %}
+	    	{% endif %}
+	      
+	    </dl>
+	</div>
+	{% endif %}
+
+      {{this_item.mdOutput|safe}}
+
+
+      <div style="clear:both;"></div>
+	
+</div>
+
+{% endblock %}

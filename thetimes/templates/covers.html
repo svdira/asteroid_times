@@ -1,0 +1,48 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}The Times | Home {% endblock %}
+
+{% block izquierda %}
+
+  {% if articles %}
+
+  <h2>{{cat.category}} Covers</h2>
+
+  <div class="image-grid">
+
+    {% for a in articles %}
+    <a href="{% url 'item' a.item.id %}"><div class="image-item" style="background-image: url('{{ a.item.mainPic}}');"></div></a>
+      
+    {% endfor %}
+    </div>
+  {% endif %}
+
+<ul class="pagination">
+
+   {% if articles.has_previous %}
+        <li><a href="?page={{ articles.previous_page_number }}">Previous</a></li>
+    {% endif %}
+
+    <li><a href="#">Page {{ articles.number }} of {{ articles.paginator.num_pages }}</a> </li>
+
+    {% if articles.has_next %}
+        <li><a href="?page={{ articles.next_page_number }}">Next</a></li>
+    {% endif %}
+
+</ul>
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+
+</ul>
+{% endblock %}

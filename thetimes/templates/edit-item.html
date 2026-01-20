@@ -297,6 +297,17 @@
 </div>
 
 <div class="right-panel">
+
+   <h4>Atributos orden|nombre|tipo|valor</h4>
+    <form method="POST"> {% csrf_token %}
+    {% csrf_token %}
+    <textarea name="txt_atributos" style="width:100%;" rows="4">{% if largo_c > 0 %}{{cadena|safe}}{% endif %}</textarea>
+<input type="submit" value="Add Attr">
+      <input type="hidden" name="formulario" value="8">
+    </form>
+
+<hr>
+
   <h4>Item Relations</h4>
 
   {% if items %}
@@ -378,6 +389,8 @@
     <input type="hidden" name="formulario" value="6">
   </form>
 
+  <hr>
+
   <h4>Textos</h4>
   {% if texts %}
   <span style="color: blue;">
@@ -390,6 +403,8 @@
     <b>Atributo:</b> <input type="text" name="attrNvo">&nbsp;<b>Valor:</b> <input type="text" name="attrVal">&nbsp;<input type="submit" value="Add Attr">
     <input type="hidden" name="formulario" value="7">
   </form>
+
+ 
 
 
 

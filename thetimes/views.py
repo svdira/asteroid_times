@@ -43,6 +43,7 @@ def addItem(request):
 	return render(request,'add-item.html',{'cats':cats})
 
 def editItem(request,i):
+	wiki = request.GET.get('wiki', 0)
 	this_item = Item.objects.get(pk=int(i))
 	search_results = None
 	item_rels = AttrItem.objects.filter(child=this_item)
@@ -51,13 +52,26 @@ def editItem(request,i):
 	item_ints = AttrInteger.objects.filter(item=this_item)
 	item_texts = AttrText.objects.filter(item=this_item)
 
+	cadena = ""
+
+	conteo = Atributos.objects.filter(item = this_item).count()
+
+	if conteo > 0:
+		atts = Atributos.objects.filter(item = this_item).order_by('orden')
+
+		for a in atts:
+			cadena = cadena + f"{a.orden}|{a.nombre}|{a.tipo}|{a.valor}\n"
+
 	if request.method == 'POST':
 		if request.POST.get("formulario") == '1':
 			this_item.contenido = request.POST.get("contenido")
 			this_item.fecha_edicion = datetime.now()
 			this_item.save()
 			if request.POST.get("guardar") == "Save and View":
-			    return redirect(f"/item/{this_item.id}")
+				if wiki == 0:
+					return redirect(f"/item/{this_item.id}")
+				else:
+					return redirect(f"/wikipage/{this_item.id}/{wiki}")
 		if request.POST.get("formulario") == '2':
 			kw = request.POST.get('keywords')
 			if len(kw)>4:
@@ -105,16 +119,47 @@ def editItem(request,i):
 			newA = AttrText.objects.create(item=this_item,att_name=nom,att_value=val)
 			newA.save()
 
+		if request.POST.get("formulario")=='8':
+			Atributos.objects.filter(item=this_item).delete()
+			txt_atributos = request.POST.get("txt_atributos")
+			lineas = []
+			for line in txt_atributos.splitlines():
+				parts = line.split('|')
+				lineas.append(parts)
 
-	return render(request,'edit-item.html',{'this_item':this_item,'sr':search_results,'items':item_rels,'pics':item_imgs,'fechas':item_dates,'ints':item_ints,'texts':item_texts})
+			for l in lineas:
+				if l[2]=='txt':
+					newAtt = Atributos.objects.create(item=this_item,orden=int(l[0]),tipo=l[2],nombre=l[1],texto=l[3])
+					newAtt.save()
+				elif l[2]=='fec':
+					newAtt = Atributos.objects.create(item=this_item,orden=int(l[0]),tipo=l[2],nombre=l[1],fecha=l[3])
+					newAtt.save()
+				elif l[2]=='int':
+					newAtt = Atributos.objects.create(item=this_item,orden=int(l[0]),tipo=l[2],nombre=l[1],entero=l[3])
+					newAtt.save()
+				elif l[2]=='dec':
+					newAtt = Atributos.objects.create(item=this_item,orden=int(l[0]),tipo=l[2],nombre=l[1],decimal=float(l[3]))
+					newAtt.save()
+
+		redirect(request.path)
+
+		cadena = ""
+		conteo = Atributos.objects.filter(item = this_item).count()
+		if conteo > 0:
+			atts = Atributos.objects.filter(item = this_item).order_by('orden')
+			for a in atts:
+				cadena = cadena + f"{a.orden}|{a.nombre}|{a.tipo}|{a.valor}\n"
+
+
+	return render(request,'edit-item.html',{'this_item':this_item,'sr':search_results,'items':item_rels,'pics':item_imgs,'fechas':item_dates,'ints':item_ints,'texts':item_texts,'cadena':cadena,'largo_c':len(cadena)})
 
 
 def homepage(request):
 	page = request.GET.get('page', 1)
-	articles = Item.objects.exclude(tipo__id__in=[14,22,6]).order_by('-fecha_creacion')
+	articles = Item.objects.exclude(tipo__id__in=[22,6,23,24,25]).order_by('-fecha_creacion')
 	paginator = Paginator(articles, 12)
 	resultados = paginator.get_page(page)
-	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	cats = sorted(Category.objects.exclude(id__in=[22,6,23,24,25]),key=lambda t: t.nitems, reverse=True)
 	if page == 1:
 	    in_progress = Consumo.objects.filter(fec_fin__isnull=True).order_by('fec_ini')
 	else:
@@ -142,6 +187,9 @@ def photo(request,photo_id):
 
 
 def categoria(request,c):
+
+	if int(c)==14:
+		return redirect('/journal')
 	page = request.GET.get('page', 1)
 	this_cat = Category.objects.get(pk=int(c))
 	articles = Item.objects.filter(tipo__id=int(c)).order_by('-fecha_creacion')
@@ -318,6 +366,18 @@ def bookHistory(request):
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	return render(request,'read-history.html',{'books':books,'nr_books':nr_books,'this_y':this_y,'anhos':anhos,'rbooks':rbooks,'qbooks':qbooks,'cats':cats,'anhos':anhos})
 
+def covers(request,c):
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	page = request.GET.get('page', 1)
+	categoria = Category.objects.get(pk=int(c))
+	articles = Consumo.objects.filter(item__tipo__id=int(c),fec_fin__isnull=False, item__attrimage__isnull=False).order_by('-fec_fin')
+	paginator = Paginator(articles, 12)
+	resultados = paginator.get_page(page)
+
+	if not articles:
+		return redirect(f'/category/{c}')
+
+	return render(request,'covers.html',{'articles':resultados,'cat':categoria,'cats':cats})
 
 def movieHistory(request):
 	get_y = request.GET.get('y', 1)
@@ -852,6 +912,132 @@ def regProgress(request):
 
 
 
+def wikihome(request):
+	return render(request,'base_wiki.html',{})
+
+
+def addwiki(request):
+	if request.method == 'POST':
+		titulo = request.POST.get("titulo")
+		categoria = Category.objects.get(pk=22)
+		contenido = request.POST.get("info")
+
+		newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
+		newI.save()
+
+		return redirect(f'/wiki/{newI.id}')
+
+	return render(request,'add-wiki.html',{})
+
+
+def wikis(request):
+	page = request.GET.get('page', 1)
+	wikis = Item.objects.filter(tipo__id=22).order_by('titulo')
+	paginator = Paginator(wikis, 30)
+	resultados = paginator.get_page(page)
+	return render(request,'wikis.html',{'wikis':resultados})
+
+
+def wiki(request,w):
+
+	page = request.GET.get('page', 1)
+	
+	this_item = Item.objects.get(pk=int(w))
+	wikipages = AttrItem.objects.filter(item=this_item).order_by('-child__fecha_edicion')
+	paginator = Paginator(wikipages, 30)
+	resultados = paginator.get_page(page)
+	
+
+
+	return render(request,'wiki.html',{'wiki':this_item,'wikis':resultados})
+
+
+def wikipage(request,p,w):
+	this_item = Item.objects.get(pk=int(p))
+	this_wiki = Item.objects.get(pk=int(w))
+	
+	atributos = Atributos.objects.filter(item=this_item).order_by('orden')
+	return render(request,'page.html',{'this_item':this_item,'this_wiki':this_wiki,'atributos':atributos})
+
+
+def addwikipage(request,w):
+	wiki = Item.objects.get(pk=int(w))
+	cats = Category.objects.filter(id__in=[6,7,23,24,25])
+
+	if request.method == 'POST':
+		titulo = request.POST.get("titulo")
+		cat_id = request.POST.get("category")
+		categoria = Category.objects.get(pk=int(cat_id))
+		contenido = request.POST.get("info")
+		newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
+		newI.save()
+
+		newRel = AttrItem.objects.create(item=wiki,child=newI,rel_name='wikipage')
+		newRel.save()
+
+		wiki_id =request.POST.get("wiki")
+		return redirect(f'/edit-item/{newI.id}?wiki={wiki_id}')
+
+
+	return render(request,'add-wiki-page.html',{'wiki':wiki,'cats':cats})
+
+
+def wikiatts(request,i,w):
+
+	this_item = Item.objects.get(pk=int(i))
+	wiki = int(w)
+	cadena = ""
+
+	conteo = Atributos.objects.filter(item = this_item).count()
+
+	if conteo > 0:
+		atts = Atributos.objects.filter(item = this_item).order_by('orden')
+
+		for a in atts:
+			cadena = cadena + f"{a.orden}|{a.nombre}|{a.tipo}|{a.valor}\n"
+
+	if request.method == 'POST':
+		Atributos.objects.filter(item=this_item).delete()
+
+		txt_atributos = request.POST.get("txt_atributos")
+
+		lineas = []
+		for line in txt_atributos.splitlines():
+			parts = line.split('|')
+			lineas.append(parts)
+
+		for l in lineas:
+			if l[2]=='txt':
+				newAtt = Atributos.objects.create(item=this_item,
+					orden=int(l[0]),
+					tipo=l[2],
+					nombre=l[1],
+					texto=l[3])
+				newAtt.save()
+			elif l[2]=='fec':
+				newAtt = Atributos.objects.create(item=this_item,
+					orden=int(l[0]),
+					tipo=l[2],
+					nombre=l[1],
+					fecha=l[3])
+				newAtt.save()
+			elif l[2]=='int':
+				newAtt = Atributos.objects.create(item=this_item,
+					orden=int(l[0]),
+					tipo=l[2],
+					nombre=l[1],
+					entero=l[3])
+				newAtt.save()
+			elif l[2]=='dec':
+				newAtt = Atributos.objects.create(item=this_item,
+					orden=int(l[0]),
+					tipo=l[2],
+					nombre=l[1],
+					decimal=float(l[3]))
+				newAtt.save()
+		return redirect(request.path) 
+
+	return render(request,'wiki-atts.html',{'this_item':this_item,'cadena':cadena,'largo_c':len(cadena)})
 
 
 

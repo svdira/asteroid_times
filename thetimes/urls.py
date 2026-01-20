@@ -37,4 +37,13 @@ urlpatterns = [
 	path('movie-credits/<nombre>', views.movieCredits, name='movieCredits'),
 	path('print-journal/<y>', views.printedJournal, name='printedJournal'),
 	path('reg-progress/', views.regProgress, name='regProgress'),
+	path('wikihome/', views.wikihome, name='wikihome'),
+	path('add-wiki/', views.addwiki, name='addwiki'),
+	path('wikis/', views.wikis, name='wikis'),
+	path('wiki/<w>', views.wiki, name='wiki'),
+	path('wikipage/<p>/<w>', views.wikipage, name='wikipage'),
+	path('add-wiki-page/<w>', views.addwikipage, name='addwikipage'),
+	path('wiki-atts/<i>/<w>', views.wikiatts, name='wikiatts'),
+	path('covers/<c>', views.covers, name='covers'),
 	]
+	

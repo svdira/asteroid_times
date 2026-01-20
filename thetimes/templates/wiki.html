@@ -1,0 +1,40 @@
+{% extends 'base_wiki.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<div class="form-card">
+
+
+	<h2>{{wiki.titulo}} <a href="{% url 'addwikipage' wiki.id %}" style="text-decoration:none; color:blue;">&#10010;</a></h2>
+	<div class="table-wrapper">
+	  <table>
+	    <tbody>
+	    {% for w in wikis %}
+	      <tr>
+	        <td><a href="{% url 'wikipage' w.child.id wiki.id %}" style="text-decoration: none; color:black;">{{w.child.titulo}} | {{w.child.tipo.category}}
+	        </a></td>
+	      </tr>
+	     {% endfor %}
+	    </tbody>
+	  </table>
+	</div>
+
+
+
+<ul class="pagination">
+
+   {% if wikis.has_previous %}
+        <li><a href="?page={{ wikis.previous_page_number }}">Previous</a></li>
+    {% endif %}
+
+    <li><a href="#">Page {{ wikis.number }} of {{ wikis.paginator.num_pages }}</a> </li>
+
+    {% if wikis.has_next %}
+        <li><a href="?page={{ wikis.next_page_number }}">Next</a></li>
+    {% endif %}
+
+</ul>
+</div>
+
+{% endblock %}

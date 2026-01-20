@@ -385,6 +385,36 @@ class Tweet(models.Model):
     def __str__(self):
         return self.item.titulo
 
+class Atributos(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='atributos')
+    orden = models.IntegerField()
+    tipo = models.CharField(max_length=3)
+    nombre = models.CharField(max_length=500)
+    fecha = models.DateField(blank=True, null=True)
+    entero = models.IntegerField(blank=True, null=True)
+    texto = models.TextField(blank=True, null=True)
+    decimal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+
+    @property
+    def valor(self):
+        v = ''
+        if self.tipo == 'fec':
+            v = self.fecha.strftime('%Y-%m-%d')
+        elif self.tipo == 'dec':
+            v = str(self.decimal)
+        elif self.tipo == 'int':
+            v = str(self.entero)
+        else:
+            v = self.texto
+
+        return v
+
+
+    def __str__(self):
+        return self.nombre + ' @ ' + self.item.titulo
+
+
 
 
 

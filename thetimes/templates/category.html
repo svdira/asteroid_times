@@ -4,7 +4,7 @@
 {% block titulo %}The Times | Home {% endblock %}
 
 {% block izquierda %}
-  <h2 style="color:blue;">Category: {{this_cat.category}}</h2>
+  <h2 style="color:blue;">Category: {{this_cat.category}} | <a href="{% url 'covers' this_cat.id%}" style="text-decoration:none;">Covers</a></h2>
   <hr>
   {% if articles %}
     {% for a in articles %}
