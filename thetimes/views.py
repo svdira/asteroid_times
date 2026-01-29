@@ -156,7 +156,7 @@ def editItem(request,i):
 
 def homepage(request):
 	page = request.GET.get('page', 1)
-	articles = Item.objects.exclude(tipo__id__in=[22,6,23,24,25]).order_by('-fecha_creacion')
+	articles = Item.objects.exclude(tipo__id__in=[14,22,6,23,24,25]).order_by('-fecha_creacion')
 	paginator = Paginator(articles, 12)
 	resultados = paginator.get_page(page)
 	cats = sorted(Category.objects.exclude(id__in=[22,6,23,24,25]),key=lambda t: t.nitems, reverse=True)
@@ -897,6 +897,7 @@ def regProgress(request):
 	conteo = BarraProgreso.objects.filter(consumo=consumo).count()
 	progreso = int(request.POST.get("progreso"))
 	anterior = 0
+	fecha_prog = request.POST.get("prog_date")
 
 
 
@@ -905,8 +906,17 @@ def regProgress(request):
 		anterior = last_barra.progreso
 
 	if progreso <= consumo.cantidad and progreso > anterior:
-		newB = BarraProgreso.objects.create(consumo=consumo, fecha = date.today(),	progreso = progreso,anterior = anterior)
-		newB.save()
+		if len(fecha_prog)>0:
+			fecha_obj = datetime.strptime(fecha_prog, "%Y-%m-%d").date()
+			if anterior > 0 and fecha_obj >= last_barra.fecha:
+				newB = BarraProgreso.objects.create(consumo=consumo, fecha = fecha_prog,	progreso = progreso,anterior = anterior)
+				newB.save()
+			elif anterior == 0 and fecha_obj >= last_barra.consumo.fec_fin:
+				newB = BarraProgreso.objects.create(consumo=consumo, fecha = fecha_prog,	progreso = progreso,anterior = anterior)
+				newB.save()
+		else:
+			newB = BarraProgreso.objects.create(consumo=consumo, fecha = date.today(),	progreso = progreso,anterior = anterior)
+			newB.save()
 
 	return redirect(f"/item/{consumo.item.id}")
 
@@ -941,12 +951,12 @@ def wikis(request):
 def wiki(request,w):
 
 	page = request.GET.get('page', 1)
-	
+
 	this_item = Item.objects.get(pk=int(w))
 	wikipages = AttrItem.objects.filter(item=this_item).order_by('-child__fecha_edicion')
 	paginator = Paginator(wikipages, 30)
 	resultados = paginator.get_page(page)
-	
+
 
 
 	return render(request,'wiki.html',{'wiki':this_item,'wikis':resultados})
@@ -955,7 +965,7 @@ def wiki(request,w):
 def wikipage(request,p,w):
 	this_item = Item.objects.get(pk=int(p))
 	this_wiki = Item.objects.get(pk=int(w))
-	
+
 	atributos = Atributos.objects.filter(item=this_item).order_by('orden')
 	return render(request,'page.html',{'this_item':this_item,'this_wiki':this_wiki,'atributos':atributos})
 
@@ -1035,7 +1045,7 @@ def wikiatts(request,i,w):
 					nombre=l[1],
 					decimal=float(l[3]))
 				newAtt.save()
-		return redirect(request.path) 
+		return redirect(request.path)
 
 	return render(request,'wiki-atts.html',{'this_item':this_item,'cadena':cadena,'largo_c':len(cadena)})
 

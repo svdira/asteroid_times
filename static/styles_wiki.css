@@ -520,43 +520,4 @@ tbody tr:last-child td {
     }
 
 
-    table {
-        font-size: 14px;
-    }
-
-    thead {
-        display: none;
-    }
-
-    tbody tr {
-        display: block;
-        margin-bottom: 16px;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-
-    tbody td {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 14px;
-        border-bottom: 1px solid #eef1f4;
-    }
-
-    tbody td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        color: #4b5563;
-        font-family: var(--font-ui);
-        margin-right: 12px;
-    }
-
-    tbody tr:last-child td:last-child {
-        border-bottom: none;
-    }
-
-    .tech-details {
-        float: none;
-        width: 100%;
-        margin: 1rem 0;
-    }
 }

@@ -38,6 +38,7 @@
        {% if cons %}<form method='POST' style='font-size: 1.2em; text-indent:1.4em;  font-family:  "Claris","Georgia", serif;'>{% csrf_token %}<label>FDate:</label>&nbsp;<input type="text" name="fec_fin" style="width:6em;"  id="datepicker" placeholder="Select date">&nbsp;<input type="submit" value="Finish"></form>
 
        <form method="POST" action="{% url 'regProgress' %}"  style='font-size: 1.2em; text-indent:1.4em;  font-family:  "Claris","Georgia", serif;'>{% csrf_token %}<label>Log:</label>&nbsp;<input type="text" name="progreso" style="width:3em;"> {{cons.unidades}}&nbsp;<input type="hidden" name="con_id" value="{{cons.id}}"><input type="submit" value="Save">
+        <input type="text" name="prog_date" style="width:9em; text-indent:1.4em;"  id="datepicker2" placeholder="Optional Date">
         {% csrf_token %}
 
        </form>
