@@ -106,26 +106,32 @@ class Item(models.Model):
     def periodo(self):
         this_v = ''
         pubyear = 0
-        if self.tipo.category.lower() in ['book','bunko','manga volume']:
-            npubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').count()
-            if npubyear > 0:
-                pubyear = AttrInteger.objects.filter(item=self,att_name='pubyear').latest('id')
-                this_v = f"({pubyear.att_value})"
-        if self.tipo.category.lower() in ['movie','season','tv series','anime','album']:
-            npubyear = AttrInteger.objects.filter(item=self,att_name='premiere').count()
-            nfin = AttrInteger.objects.filter(item=self,att_name='finale').count()
-            if npubyear > 0:
-                pubyear = AttrInteger.objects.filter(item=self,att_name='premiere').latest('id')
-            if nfin > 0:
-                finale = AttrInteger.objects.filter(item=self,att_name='finale').latest('id')
+        inicios = Atributos.objects.filter(item=self, nombre__in=['pubyear','pubdate','premiere']).count()
+        finales = Atributos.objects.filter(item=self, nombre__in=['finale']).count()
+        inicio = 0
+        fin = 0
+        if inicios > 0:
+            objeto = Atributos.objects.filter(item=self, nombre__in=['pubyear','pubdate','premiere']).latest('id')
+            if objeto.tipo == 'int':
+                inicio = int(objeto.entero)
+            if objeto.tipo == 'fec':
+                inicio = objeto.fecha.year
 
-            if nfin == 0 and npubyear > 0:
-                this_v = f"({pubyear.att_value})"
-            elif nfin > 0 and npubyear > 0 and finale == pubyear:
-                this_v = f"({pubyear.att_value})"
-            elif nfin > 0 and npubyear > 0 and finale != pubyear:
-                this_v = f"({pubyear.att_value} - {finale.att_value})"
+        if finales > 0:
+            objeto = Atributos.objects.filter(item=self, nombre__in=['finale']).latest('id')
+            if objeto.tipo == 'int':
+                fin  = int(objeto.entero)
+            if objeto.tipo == 'fec':
+                fin = objeto.fecha.year
 
+        if inicio > 0 and fin >0:
+            this_v = f"({inicio}-{fin})"
+        if inicio>0 and fin==0:
+            this_v = f"({inicio})"
+        if inicio==0 and fin>0:
+            this_v = f"({fin})"
+
+        
 
         return this_v
 
@@ -142,7 +148,7 @@ class Item(models.Model):
 
     @property
     def aplica_consumo(self):
-        if self.tipo.category.lower() in ['book','movie','bunko','anime','season','manga volume','album']:
+        if self.tipo.category.lower() in ['book','movie','bunko','anime','season','manga series','album']:
             return True
         else:
             return None
@@ -164,6 +170,7 @@ class Consumo(models.Model):
     multiplicador = models.IntegerField()
     consumo = models.IntegerField()
     formato = models.CharField(max_length=200)
+    inprogress = models.BooleanField(default=False)
 
     def __str__(self):
         return self.item.titulo
@@ -205,6 +212,7 @@ class AttrImage(models.Model):
     imagen = models.ImageField(upload_to=path_and_name, max_length=255, null=True, blank=True)
     caption = models.TextField()
     tipo = models.CharField(max_length=30)
+    vista = models.BooleanField(default=False)
 
 
     def save(self, *args, **kwargs):
@@ -240,6 +248,7 @@ class AttrInteger(models.Model):
     item = models.ForeignKey(Item,on_delete=models.CASCADE)
     att_name = models.CharField(max_length=255)
     att_value = models.IntegerField()
+    vista = models.BooleanField(default=False)
 
     def __str__(self):
         return self.att_name + ' @ ' + self.item.titulo

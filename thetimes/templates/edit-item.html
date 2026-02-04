@@ -282,7 +282,7 @@
 <div class="container">
 
 <div class="left-panel">
-  <h2>{{this_item.titulo}} <a href="{% url 'item' this_item.id %}" style="text-decoration:none;">&lt;-</a></h2>
+  <h2>{{this_item.titulo}}{% if this_item.periodo %}&nbsp;{{this_item.periodo}}{% endif %}</h2>
   <br>
   <form method="POST">
     {% csrf_token %}
@@ -306,41 +306,6 @@
       <input type="hidden" name="formulario" value="8">
     </form>
 
-<hr>
-
-  <h4>Item Relations</h4>
-
-  {% if items %}
-  <span style="color: blue;">
-    {% for i in items %}
-      {{i.rel_name}}: {{i.item.titulo}} |
-    {% endfor %}
-  </span><br><br>
-  {% endif %}
-
-  <form method="POST"> {% csrf_token %}
-    <b>New Relation:</b>&nbsp;<input type="text" name="keywords" style="width:25em;">&nbsp;<input type="submit" value="Search">
-    <input type="hidden" name="formulario" value="2">
-  </form>
-
-
-
-  {% if sr %}
-     <br>
- <i>Results</i><br>
-    <form method="POST">  {% csrf_token %}
-      <b>Item:
-    <select name="item_id">
-      {% for r in sr %}
-        <option value="{{r.id}}">{{r.titulo}}</option>
-      {% endfor %}
-    </select>
-    &nbsp;<input type="text" name="relacion" style="width:12em;">&nbsp;<input type="submit" value="Add Rel.">
-
-    <input type="hidden" name="formulario" value="3">
-    </form>
-  {% endif %}
-
   <hr>
 
   <h4>Pictures</h4>
@@ -360,52 +325,6 @@
   </form>
 
   <hr>
-
-  <h4>Dates</h4>
-  {% if fechas %}
-  <span style="color: blue;">
-    {% for p in fechas %}
-      {{p.att_name}}: {{p.att_value}} |
-    {% endfor %}
-  </span><br><br>
-  {% endif %}
-  <form method="POST"> {% csrf_token %}
-    <b>Atributo:</b> <input type="text" name="attrNvo">&nbsp;<b>Valor:</b> <input type="text" name="attrVal">&nbsp;<input type="submit" value="Add Attr">
-    <input type="hidden" name="formulario" value="5">
-  </form>
-
-  <hr>
-
-  <h4>Integers</h4>
-  {% if ints %}
-  <span style="color: blue;">
-    {% for p in ints %}
-      {{p.att_name}}: {{p.att_value}} |
-    {% endfor %}
-  </span><br><br>
-  {% endif %}
-  <form method="POST"> {% csrf_token %}
-    <b>Atributo:</b> <input type="text" name="attrNvo">&nbsp;<b>Valor:</b> <input type="text" name="attrVal">&nbsp;<input type="submit" value="Add Attr">
-    <input type="hidden" name="formulario" value="6">
-  </form>
-
-  <hr>
-
-  <h4>Textos</h4>
-  {% if texts %}
-  <span style="color: blue;">
-    {% for p in texts %}
-      {{p.att_name}}: {{p.att_value}} |
-    {% endfor %}
-  </span><br><br>
-  {% endif %}
-  <form method="POST"> {% csrf_token %}
-    <b>Atributo:</b> <input type="text" name="attrNvo">&nbsp;<b>Valor:</b> <input type="text" name="attrVal">&nbsp;<input type="submit" value="Add Attr">
-    <input type="hidden" name="formulario" value="7">
-  </form>
-
- 
-
 
 
 </div>

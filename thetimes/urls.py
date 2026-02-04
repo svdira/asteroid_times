@@ -45,5 +45,6 @@ urlpatterns = [
 	path('add-wiki-page/<w>', views.addwikipage, name='addwikipage'),
 	path('wiki-atts/<i>/<w>', views.wikiatts, name='wikiatts'),
 	path('covers/<c>', views.covers, name='covers'),
+	path('view-photos/<i>/<w>', views.viewphotos, name='viewphotos'),
 	]
 	

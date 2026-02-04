@@ -283,9 +283,9 @@ def startConsumo(request,i):
 		duracion = obj_duracion.att_value
 
 
-	if this_item.tipo.category.lower() in ['book','bunko','manga volume','comic book']:
+	if this_item.tipo.category.lower() in ['book','bunko','manga series','comic book']:
 		formatos = ['printed','kindle','boox','audiobook']
-		units = ['paginas','location','minutos']
+		units = ['paginas','location','minutos','chapters']
 
 	if this_item.tipo.category.lower() in ['movie','album']:
 		formatos = ['streaming','download','theater','cd/dvd/lp']
@@ -863,6 +863,9 @@ def savemovie(request):
 	newA = AttrInteger.objects.create(item=this_item,att_name='premiere',att_value=int(mpremiere))
 	newA.save()
 
+	newA = Atributos.objects.create(item=this_item,nombre='premiere',tipo='int',orden=1,entero=int(mpremiere))
+	newA.save()
+
 	newA = AttrInteger.objects.create(item=this_item,att_name='runtime',att_value=int(mruntime))
 	newA.save()
 
@@ -1049,6 +1052,24 @@ def wikiatts(request,i,w):
 
 	return render(request,'wiki-atts.html',{'this_item':this_item,'cadena':cadena,'largo_c':len(cadena)})
 
+def viewphotos(request,i,w):
+	this_item = Item.objects.get(pk=int(i))
 
+	nphotos = AttrImage.objects.filter(item=this_item,tipo='panorma').count()
+
+	if nphotos > 0:
+		vphotos = AttrImage.objects.filter(item=this_item,tipo='panorma', vista = False).count()
+		if vphotos == 0:
+			AttrImage.objects.filter(item=this_item,tipo='panorma', vista = True).update(vista=False)
+
+		pks = AttrImage.objects.filter(item=this_item,tipo='panorma', vista = False).values_list('pk', flat=True)
+		random_pk = choice(pks)
+		random_obj = AttrImage.objects.get(pk=random_pk)
+		random_obj.vista = True
+		random_obj.save()
+
+		return render(request,'view-photos.html',{'this_item':this_item,'this_pic':random_obj,'wiki_id':w})
+	else:
+		return redirect(f'/wikipage/{i}/{w}')
 
 

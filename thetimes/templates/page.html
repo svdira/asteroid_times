@@ -8,7 +8,7 @@
 
 	<h2><a href='/edit-item/{{this_item.id}}?wiki={{this_wiki.id}}' style='text-decoration: none; color: #007bff;'>{{this_item.titulo}}</a></h2>
 
-	<p style="font-family:Arial,Helvetica,sans-serif;"><a href="{% url 'wiki' this_wiki.id %}" style="text-decoration: none; color:grey;">{{this_wiki.titulo}}</a></p>
+	<p style="font-family:Arial,Helvetica,sans-serif;"><a href="{% url 'wiki' this_wiki.id %}" style="text-decoration: none; color:grey;">{{this_wiki.titulo}}</a> | <a href="{% url 'viewphotos' this_item.id this_wiki.id %}" style="text-decoration: none; color:grey;">Gallery</a></p>
 	
 
 
