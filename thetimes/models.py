@@ -63,9 +63,9 @@ class Item(models.Model):
     def headtext(self):
         n_corte = self.contenido.find('==headtext==')
         if n_corte == -1:
-            return self.contenido[0:350]
+            return self.contenido[0:350] + f" <a href='/item/{self.id}' style='text-decoration:none;'>&#128269;</a>"
         else:
-            return markdown.markdown(self.contenido[0:n_corte],extensions=['extra'])
+            return markdown.markdown(self.contenido[0:n_corte] + f" <a href='/item/{self.id}' style='text-decoration:none;'>&#128269;</a>",extensions=['extra'])
 
     @property
     def mdOutput(self):
@@ -126,12 +126,12 @@ class Item(models.Model):
 
         if inicio > 0 and fin >0:
             this_v = f"({inicio}-{fin})"
-        if inicio>0 and fin==0:
+        if (inicio>0 and fin==0) or (inicio>0 and fin>0 and inicio==fin):
             this_v = f"({inicio})"
         if inicio==0 and fin>0:
             this_v = f"({fin})"
 
-        
+
 
         return this_v
 
@@ -330,14 +330,14 @@ class Partido(models.Model):
     @property
     def headline(self):
         if self.terminado == False:
-            return self.local.nombre + ' v ' + self.visita.nombre + ' @ ' + self.torneo.nombre
+            return self.local.nombre + ' v ' + self.visita.nombre 
         else:
             if (self.rondap_local +  self.rondap_visita) > 0:
                 m = f"{self.goles_local}({self.rondap_local}) - ({self.goles_visita}){self.goles_visita}"
             else:
                 m = f"{self.goles_local} - {self.goles_visita}"
 
-            return self.local.nombre + f' {m} ' + self.visita.nombre + ' @ ' + self.torneo.nombre
+            return self.local.nombre + f' {m} ' + self.visita.nombre 
 
     @property
     def marcador(self):
@@ -422,6 +422,17 @@ class Atributos(models.Model):
 
     def __str__(self):
         return self.nombre + ' @ ' + self.item.titulo
+
+class NotaPartido(models.Model):
+    partido = models.ForeignKey(Partido, on_delete=models.CASCADE)
+    minuto = models.IntegerField()
+    comentario = models.TextField()
+
+
+    def __str__(self):
+        return self.minuto+ ' @ '+ self.partido.headline
+
+
 
 
 

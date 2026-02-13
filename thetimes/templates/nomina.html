@@ -1,0 +1,112 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}{{this_equipo.nombre}}'s Page{% endblock %}
+
+{% block izquierda %}
+
+
+<h2>{{this_equipo.nombre}}'s Players | <a href="{% url 'equipo' this_equipo.id %}">Matches</a> </h2>
+
+<p><span class="detalles"><a href="{% url 'addContrato' this_equipo.id %}"  style="text-decoration:none; color:grey;">Add Contract</a></span></p>
+
+
+{% if dt %}
+<br>
+  <table>
+    <tr>
+      <th style="text-align: left;">Coach</th>
+    </tr>
+    {% for c in dt %}
+      <tr>
+        <td>{{c.jugador.nombre}}</td>
+        <td>{{c.dorsal}}</td>
+        <td>{{c.jugador.pais}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+
+{% if arqueros %}
+<br>
+  <table>
+    <th style="text-align: left;">Goal Keepers</th>
+    {% for c in arqueros %}
+      <tr>
+        <td>{{c.jugador.nombre}}</td>
+        <td>{{c.dorsal}}</td>
+        <td>{{c.jugador.pais}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+
+{% if defensas %}
+<br>
+
+  <table>
+    <th style="text-align: left;">Defenders</th>
+    {% for c in defensas %}
+      <tr>
+        <td>{{c.jugador.nombre}}</td>
+        <td>{{c.dorsal}}</td>
+        <td>{{c.jugador.pais}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+
+{% if centros %}
+<br>
+
+  <table>
+    <th style="text-align: left;">Midfielders</th>
+    {% for c in centros %}
+      <tr>
+        <td>{{c.jugador.nombre}}</td>
+        <td>{{c.dorsal}}</td>
+        <td>{{c.jugador.pais}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+
+{% if delanteros %}
+<br>
+
+  <table>
+    <th style="text-align: left;">Forwards</th>
+    {% for c in delanteros %}
+      <tr>
+        <td>{{c.jugador.nombre}}</td>
+        <td>{{c.dorsal}}</td>
+        <td>{{c.jugador.pais}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+
+
+{% endblock %}
+
+
+
+
+
+
+{% block derecha %}
+
+<h3>Leagues</h3>
+
+<ul class="list-group">
+    {% for c in ligas %}
+
+
+        <li class="list-group-item"><a href="{% url 'liga' c.id %}" style="text-decoration:none; color:black;">{{c.nombre}}</a> <span class="badge badge-pill">{{c.npartidos}}</span></li>
+
+    {% endfor %}
+
+</ul>
+
+
+{% endblock %}

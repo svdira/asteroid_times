@@ -8,7 +8,7 @@
   <hr>
   {% if articles %}
     {% for a in articles %}
-      <h2><a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
+      <h2>{% if a.consumido%}&#9989;&nbsp;{%endif%}<a href="{% url 'item' a.id %}" style="text-decoration:none; color:#007bff; ">{{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}</a></h2>
       <p><span class="detalles">{{a.tipo.category|capfirst}}{% if a.fecha_creacion|date:"Y-m-d" > '1999-12-31' %} | {{a.fecha_creacion|date:"M j, Y"}}{% endif %}{% if a.nrelated > 0 %} | <a href="{% url 'relatedItems' a.id %}" style="text-decoration:none; color:grey;">Related ({{a.nrelated}})</a>{% endif %}</span></p>
       {{a.headtext|safe}}
       <div style="clear:both;"></div>

@@ -21,6 +21,7 @@ urlpatterns = [
 	path('print-html/<cid>', views.printHTML, name='printHTML'),
 	path('add-contrato/<equipo>', views.addContrato, name='addContrato'),
 	path('equipo/<equipo>', views.equipo, name='equipo'),
+	path('nomina/<equipo>', views.nomina, name='nomina'),
 	path('liga/<liga>', views.liga, name='liga'),
 	path('add-match/<liga>', views.addMatch, name='addMatch'),
 	path('partido/<p>', views.partido, name='partido'),
@@ -46,5 +47,6 @@ urlpatterns = [
 	path('wiki-atts/<i>/<w>', views.wikiatts, name='wikiatts'),
 	path('covers/<c>', views.covers, name='covers'),
 	path('view-photos/<i>/<w>', views.viewphotos, name='viewphotos'),
+	path('quemar/<i>', views.quemar, name='quemar'),
+	path('add-nota-partido/<p>', views.addnotapartido, name='addnotapartido'),
 	]
-	

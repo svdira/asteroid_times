@@ -30,7 +30,7 @@ def addItem(request):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime','tv series','season','persona','album','band']:
+		if categoria.category.lower() in ['book','bunko','manga series','comic book','movie','anime','tv series','season','persona','album','band']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
 		    newI.save()
 		else:
@@ -161,7 +161,7 @@ def homepage(request):
 	resultados = paginator.get_page(page)
 	cats = sorted(Category.objects.exclude(id__in=[22,6,23,24,25]),key=lambda t: t.nitems, reverse=True)
 	if page == 1:
-	    in_progress = Consumo.objects.filter(fec_fin__isnull=True).order_by('fec_ini')
+	    in_progress = Consumo.objects.filter(fec_fin__isnull=True).order_by('-id')
 	else:
 	    in_progress = None
 
@@ -202,6 +202,7 @@ def categoria(request,c):
 
 def item(request,i):
 	this_item = Item.objects.get(pk=int(i))
+	atributos = Atributos.objects.filter(item=this_item).order_by('orden')
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	ncon = Consumo.objects.filter(item = this_item, fec_fin__isnull=True).count()
 	if ncon > 0:
@@ -270,7 +271,7 @@ def item(request,i):
 		enlaces_c = enlaces_c[:-7]
 
 
-	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'cons':con_in_prog,'conteo_r':conteo_rel,'conteo_p':conteo_pars,'parents':parents,'enlaces_d':enlaces_d,'enlaces_c':enlaces_c,'tipos':tipos,'cats_show_ratio':cats_show_ratio})
+	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'natt':len(atributos),'atributos':atributos,'cons':con_in_prog,'conteo_r':conteo_rel,'conteo_p':conteo_pars,'parents':parents,'enlaces_d':enlaces_d,'enlaces_c':enlaces_c,'tipos':tipos,'cats_show_ratio':cats_show_ratio})
 
 def startConsumo(request,i):
 	this_item = Item.objects.get(pk=int(i))
@@ -343,7 +344,7 @@ def startConsumo(request,i):
 def bookHistory(request):
 	get_y = request.GET.get('y', 1)
 
-	conteo_0 = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).count()
+	conteo_0 = Consumo.objects.filter(item__tipo__category='Book',item__consumido=True,fec_fin__isnull=False).count()
 	if conteo_0 == 0:
 	    return redirect('/book-queue/')
 
@@ -353,7 +354,7 @@ def bookHistory(request):
 
 	books = Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False, fec_fin__year=this_y).order_by('-fec_fin')
 	rbooks = len(books)
-	qbooks = Item.objects.filter(tipo__category='Book',consumo__item__isnull=True).count()
+	qbooks = Item.objects.filter(tipo__category='Book',consumo__item__isnull=True, consumido= False).count()
 	in_progress = Consumo.objects.filter(item__tipo__category='Book', fec_fin__isnull=True)
 
 	nr_books = Item.objects.filter(tipo__category='Book',consumido	= True).count()
@@ -390,7 +391,7 @@ def movieHistory(request):
 
 	books = Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False, fec_fin__year=this_y).order_by('-fec_fin')
 	rbooks = len(books)
-	qbooks = Item.objects.filter(tipo__category='Movie',consumo__item__isnull=True).count()
+	qbooks = Item.objects.filter(tipo__category='Movie',consumo__item__isnull=True, consumido=False).count()
 	in_progress = Consumo.objects.filter(item__tipo__category='Movie', fec_fin__isnull=True)
 
 	nr_books = Item.objects.filter(tipo__category='Movie',consumido	= True).count()
@@ -404,7 +405,7 @@ def movieHistory(request):
 	return render(request,'watch-history.html',{'books':books,'nr_books':nr_books,'this_y':this_y,'anhos':anhos,'rbooks':rbooks,'qbooks':qbooks,'cats':cats,'anhos':anhos})
 
 def movieQueue(request):
-	books = sorted(Item.objects.filter(tipo__category='Movie',consumo__item__isnull=True), key=lambda t: t.periodo, reverse=False)
+	books = sorted(Item.objects.filter(tipo__category='Movie',consumo__item__isnull=True, consumido=False), key=lambda t: t.periodo, reverse=False)
 	qbooks = len(books)
 	rbooks =  Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False).count()
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
@@ -413,7 +414,7 @@ def movieQueue(request):
 	return render(request,'watch-queue.html',{'now_reading':in_progress,'books':books,'rbooks':rbooks,'qbooks':qbooks,'cats':cats})
 
 def bookQueue(request):
-	books = sorted(Item.objects.filter(tipo__category='Book',consumo__item__isnull=True), key=lambda t: t.periodo, reverse=False)
+	books = sorted(Item.objects.filter(tipo__category='Book',consumo__item__isnull=True, consumido= False), key=lambda t: t.periodo, reverse=False)
 	qbooks = len(books)
 	rbooks =  Consumo.objects.filter(item__tipo__category='Book',fec_fin__isnull=False).count()
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
@@ -516,7 +517,7 @@ def addContrato(request,equipo):
 		newC = Contrato.objects.create(equipo=equipo,jugador=newJ, fec_ini = fec_ini, posicion=posicion,n_posicion=n_p, dorsal=dorsal,last_edited=datetime.today().date())
 		newC.save()
 
-		return redirect(f'/equipo/{equipo.id}')
+		return redirect(f'/nomina/{equipo.id}')
 
 	return render(request,'add-contrato.html',{'cats':cats,'this_equipo':equipo})
 
@@ -562,12 +563,56 @@ def equipo(request,equipo):
 
 	return render(request,'equipo.html',{'cats':cats,'this_equipo':equipo,'arqueros':arqueros,'defensas':defensas, 'centros':centros,'delanteros':delanteros,'vector_p':vector_p,'stats':stats,'dt':dt,'ligas':ligas,'partidos':partidos})
 
+
+def nomina(request,equipo):
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	equipo = Equipo.objects.get(pk=int(equipo))
+	ligas = Torneo.objects.all().order_by('-id')
+
+	arqueros = Contrato.objects.filter(equipo=equipo, posicion='arquero', fec_fin__isnull=True).order_by('dorsal')
+	defensas = Contrato.objects.filter(equipo=equipo, posicion='defensa', fec_fin__isnull=True).order_by('dorsal')
+	centros = Contrato.objects.filter(equipo=equipo, posicion='centrocampista', fec_fin__isnull=True).order_by('dorsal')
+	delanteros = Contrato.objects.filter(equipo=equipo, posicion='delantero', fec_fin__isnull=True).order_by('dorsal')
+	dt = Contrato.objects.filter(equipo=equipo, posicion='dt', fec_fin__isnull=True).order_by('dorsal')
+
+	partidos = Partido.objects.filter(Q(local=equipo) | Q(visita=equipo)).exclude(terminado=False).order_by('-fecha')[0:25]
+
+	vector_p = ''
+	for p in partidos:
+		if  p.goles_local == p.goles_visita:
+			this_r = 'D'
+		elif p.local == equipo and p.goles_local > p.goles_visita:
+			this_r = 'W'
+		elif p.local == equipo and p.goles_local < p.goles_visita:
+			this_r = 'L'
+		elif p.visita == equipo and p.goles_local > p.goles_visita:
+			this_r = 'L'
+		elif p.visita == equipo and p.goles_local < p.goles_visita:
+			this_r = 'W'
+
+		vector_p = vector_p + this_r
+
+
+	conteo = len(vector_p)
+	ganes = vector_p.count("W")
+	empates = vector_p.count("D")
+	perdidos = vector_p.count("L")
+
+	stats = [conteo,ganes,empates,perdidos]
+
+
+
+
+	return render(request,'nomina.html',{'cats':cats,'this_equipo':equipo,'arqueros':arqueros,'defensas':defensas, 'centros':centros,'delanteros':delanteros,'vector_p':vector_p,'stats':stats,'dt':dt,'ligas':ligas,'partidos':partidos})
+
+
+
 def liga(request,liga):
 	ligas = Torneo.objects.all().order_by('-id')
 	this_liga = Torneo.objects.get(pk=int(liga))
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	pp = Partido.objects.filter(torneo=this_liga, terminado=False).order_by('fecha','id')
-	pt = Partido.objects.filter(torneo=this_liga, terminado=True).order_by('-fecha','id')
+	pt = Partido.objects.filter(torneo=this_liga, terminado=True).order_by('-fecha','id')[0:30]
 	tabla = None
 	if pt:
 		tabla = Partido.objects.raw(f"select * from posiciones where id={this_liga.id} order by pts desc, DG desc, GF desc, PJ desc")
@@ -603,6 +648,7 @@ def partido(request,p):
 	cats = sorted(Category.objects.all(),key=lambda t: t.nitems, reverse=True)
 	pl = None
 	pv = None
+	comms = NotaPartido.objects.filter(partido=this_partido).order_by('minuto')
 	contratos_l = None
 	contratos_v = None
 
@@ -618,14 +664,17 @@ def partido(request,p):
 	next_m = Partido.objects.filter(torneo=this_partido.torneo, fecha__gte=this_partido.fecha,terminado=False).exclude(id=this_partido.id).order_by('fecha','id')
 
 	if request.method == 'POST':
+		pl = None
+		pv = None
 		marcador = request.POST.get("marcador").split("-")
 		goles_local = marcador[0].strip()
 		goles_visita = marcador[1].strip()
 
-		if request.POST.get("pl",""):
-			pl = request.POST.get("pl","")
-		if request.POST.get("pv",""):
-			pv = request.POST.get("pv","")
+		if len(marcador)==4:
+			pl = marcador[2].strip()
+			pv = marcador[3].strip()
+			
+
 
 		this_partido.goles_local = int(goles_local)
 		this_partido.goles_visita = int(goles_visita)
@@ -635,7 +684,28 @@ def partido(request,p):
 		this_partido.terminado = True
 		this_partido.save()
 
-	return render(request,'partido.html',{'cats':cats,'this_partido':this_partido,'next_m':next_m,'ligas':ligas,'contratos_l':contratos_l,'contratos_v':contratos_v,'goles':goles})
+	return render(request,'partido.html',{'cats':cats,'comms':comms,'this_partido':this_partido,'next_m':next_m,'ligas':ligas,'contratos_l':contratos_l,'contratos_v':contratos_v,'goles':goles})
+
+def addnotapartido(request,p):
+	this_partido = Partido.objects.get(pk=int(p))
+
+	if request.method == 'POST':
+		if len(request.POST.get("minuto"))==0:
+			minuto = 0
+		else:
+			minuto = int(request.POST.get("minuto",0))
+
+		comentario = request.POST.get("comment")
+
+		newN = NotaPartido.objects.create(partido = this_partido, minuto = minuto, comentario = comentario)
+		newN.save()
+
+		return redirect(f'/partido/{this_partido.id}')
+
+
+
+	return render(request,'add-nota-partido.html',{'this_partido':this_partido})
+
 
 
 def futbol(request,p):
@@ -1071,5 +1141,9 @@ def viewphotos(request,i,w):
 		return render(request,'view-photos.html',{'this_item':this_item,'this_pic':random_obj,'wiki_id':w})
 	else:
 		return redirect(f'/wikipage/{i}/{w}')
+
+def quemar(request,i):
+    Item.objects.filter(id=int(i)).update(consumido=True)
+    return redirect(f'/item/{i}')
 
 

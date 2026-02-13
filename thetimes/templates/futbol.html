@@ -16,19 +16,36 @@
 <h2>Coming Matches | <a href="{% url 'futbol' 1 %}">Finished</a></h2><br>
   {% if cm %}
     {% for m in cm %}
-      <table>
-        <tr>
-          <th colspan="6" style="text-align: left;">{{m.liga}}</th>
-        </tr>
+    
+          <h3>{{m.liga}}<h3>
         {% for i in m.partidos %}
-        <tr>
-          <td>{{i.fecha|date:"m/d"}}</td>
-          <td><p><a href="{% url 'partido' i.id %}" style="color:black; text-decoration:none;">{{i.local.nombre}}<br>{{i.visita.nombre}}</a></p></td>
-          <td>{{i.fase}}</td>
-        </tr>
+          <a href="{% url 'partido' i.id %}" style="text-decoration:none;">
+        <div class="match-card">
+          <div class="match-meta">
+            <span class="match-date">{{i.fecha}}</span>
+            <span class="match-league">{{i.fase}}</span>
+          </div>
+
+          <div class="match-body">
+            <div class="team home">
+              <span class="team-name">{{i.local.nombre}}</span>
+            </div>
+
+            <div class="score">
+              <span class="goals">&nbsp;&nbsp;</span>
+              <span class="divider">–</span>
+              <span class="goals">&nbsp;&nbsp;</span>
+            </div>
+
+            <div class="team away">
+              <span class="team-name">{{i.visita.nombre}}</span>
+            </div>
+          </div>
+        </div></a>
+        <br>
         {% endfor %}
 
-      </table>   <br>
+   
     {% endfor %}
   {% endif %}
 
@@ -38,20 +55,40 @@
 
  {% if cm %}
     {% for m in cm %}
-      <table>
-        <tr>
-          <th colspan="6" style="text-align: left;">{{m.liga}}</th>
-        </tr>
+      
+    
+        <h3>{{m.liga}}</h3>
         {% for i in m.partidos %}
-        <tr>
-          <td>{{i.fecha|date:"m/d"}}</td>
-          <td><p><a href="{% url 'partido' i.id %}" style="color:black; text-decoration:none;">{{i.local.nombre}}<br>{{i.visita.nombre}}</a></p></td>
-          <td style="text-align:right;"><p><a href="{% url 'partido' i.id %}" style="color:blue; text-decoration: none;">{{i.goles_local}}<br>{{i.goles_visita}}</a></p></td>
-          <td>{{i.fase}}</td>
-        </tr>
+  
+        <a href="{% url 'partido' i.id %}" style="text-decoration:none;">
+        <div class="match-card">
+          <div class="match-meta">
+            <span class="match-date">{{i.fecha}}</span>
+            <span class="match-league">{{i.fase}}</span>
+          </div>
+
+          <div class="match-body">
+            <div class="team home">
+              <span class="team-name">{{i.local.nombre}}</span>
+            </div>
+
+            <div class="score">
+              <span class="goals">{{i.goles_local}}{% if i.rondap_local %}&nbsp;({{i.rondap_local}}{% endif %}</span>
+              <span class="divider">–</span>
+              <span class="goals">{% if i.rondap_visita%}{{i.rondap_visita}})&nbsp;{% endif %}{{i.goles_visita}}</span>
+            </div>
+
+            <div class="team away">
+              <span class="team-name">{{i.visita.nombre}}</span>
+            </div>
+          </div>
+        </div>
+      </a>
+        <br>
         {% endfor %}
 
-      </table>   <br>
+    
+
     {% endfor %}
   {% endif %}
 
