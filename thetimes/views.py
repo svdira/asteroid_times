@@ -628,12 +628,13 @@ def liga(request,liga):
 	this_liga = Torneo.objects.get(pk=int(liga))
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	pp = Partido.objects.filter(torneo=this_liga, terminado=False).order_by('fecha','id')
-	pt = Partido.objects.filter(torneo=this_liga, terminado=True).order_by('-fecha','id')[0:30]
+	pt = Partido.objects.filter(torneo=this_liga, terminado=True).filter(Q(fase__contains='MD-') | Q(fase__contains='Group')).order_by('-fecha','id')[0:30]
+	pe = Partido.objects.filter(torneo=this_liga, terminado=True).exclude(Q(fase__contains='MD-') | Q(fase__contains='Group')).order_by('-fecha','id')
 	tabla = None
 	if pt:
 		tabla = Partido.objects.raw(f"select * from posiciones where id={this_liga.id} order by pts desc, DG desc, GF desc, PJ desc")
 
-	return render(request,'liga.html',{'cats':cats,'this_liga':this_liga,'pp':pp,'pt':pt,'ligas':ligas,'tabla':tabla})
+	return render(request,'liga.html',{'cats':cats,'this_liga':this_liga,'pe':pe,'pp':pp,'pt':pt,'ligas':ligas,'tabla':tabla})
 
 
 def ligaEquipo(request,liga,equipo):

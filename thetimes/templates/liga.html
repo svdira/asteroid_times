@@ -10,7 +10,45 @@
 <p><span class="detalles"><a href="{% url 'addMatch' this_liga.id %}"  style="text-decoration:none; color:grey;">Add Match</a> | <a href="{% url 'addTeams' this_liga.id %}"  style="text-decoration:none; color:grey;">Add Teams</a></span></p>
 
 
+{% if pe %}
+
+  <h3>Elimination Matches</h3>
+
+  {% for p in pe %}
+  
+        <div class="match-card">
+          <div class="match-meta">
+            <span class="match-date">{{p.fecha}}</span>
+            <span class="match-league"><a href="{% url 'ligaFase' this_liga.id p.fase %}" style="text-decoration:none; color:blue;">{{p.fase}}</a></span>
+          </div>
+          <a href="{% url 'partido' p.id %}" style="text-decoration:none;">
+          <div class="match-body">
+            <div class="team home">
+              <span class="team-name">{{p.local.nombre}}</span>
+            </div>
+
+            <div class="score">
+              <span class="goals">{{p.goles_local}}{% if p.rondap_local %}&nbsp;({{p.rondap_local}}{% endif %}</span>
+              <span class="divider">–</span>
+              <span class="goals">{% if p.rondap_visita%}{{p.rondap_visita}})&nbsp;{% endif %}{{p.goles_visita}}</span>
+            </div>
+
+
+            <div class="team away">
+              <span class="team-name">{{p.visita.nombre}}</span>
+            </div>
+          </div></a>
+        </div>
+      
+        <br>
+  {% endfor %}
+
+{% endif %}
+
+
 {% if tabla %}
+<br>
+<h2>Position Table</h2><br>
   <table>
     <tr>
       <th>#</th>
