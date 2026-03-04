@@ -38,7 +38,7 @@
 <div class="match-card">
   <div class="match-meta">
     <span class="match-date">{{this_partido.fecha}}</span>
-    <span class="match-league">{{this_partido.torneo.nombre}}</span>
+    <span class="match-league"><a href="{% url 'liga' this_partido.torneo.id %}" style="text-decoration:none; color:blue;">{{this_partido.torneo.nombre}}</a></span>
   </div>
 
   <div class="match-body">

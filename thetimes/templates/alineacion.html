@@ -6,7 +6,7 @@
 {% block izquierda %}
 
 
-<h2>LineUps {{this_partido.headline}}</h2>
+<h2>LineUps <a href="{% url 'partido' this_partido.id %}" style="text-decoration:none;">{{this_partido.headline}}</a></h2>
 <br>
 
 {% if alineaciones %}
@@ -54,6 +54,18 @@
   <input type="submit" value="Save LineUP">
 
 
+</form>
+<br>
+<hr>
+<h3>Add New Player</h3>
+<form action="{% url 'addContratoShort' %}" method="POST">
+  {% csrf_token %}
+  <label>Nombre</label>
+  <input type="text" name="nombre" style="padding-top:0.3rem; padding-bottom: 0.3rem;">
+  <input type="hidden" name="equipo" value="{{this_equipo.id}}">
+  <input type="hidden" name="partido" value="{{this_partido.id}}">
+  <br><br>
+  <input type="submit" value="Add Player">  
 </form>
 
 

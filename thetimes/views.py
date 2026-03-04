@@ -521,6 +521,23 @@ def addContrato(request,equipo):
 
 	return render(request,'add-contrato.html',{'cats':cats,'this_equipo':equipo})
 
+def addContratoShort(request):
+	equipo = Equipo.objects.get(pk=int(request.POST.get("equipo")))
+	partido = Partido.objects.get(pk=int(request.POST.get("partido")))
+	nombre = request.POST.get("nombre")
+
+	conteo_x = Jugador.objects.filter(nombre=nombre).count()
+	if conteo_x > 0:
+		newJ = Jugador.objects.filter(nombre=nombre).latest('id')
+	else:
+		newJ = Jugador.objects.create(nombre=nombre, pais='TBA', info='TBA')
+		newJ.save()
+
+	newC = Contrato.objects.create(equipo=equipo,jugador=newJ, fec_ini = '1999-12-31', posicion='TBA',n_posicion=0, dorsal=0,last_edited=datetime.today().date())
+	newC.save()
+
+	return redirect(f"/alineacion/{partido.id}/{equipo.id}")
+
 
 def equipo(request,equipo):
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
@@ -533,7 +550,7 @@ def equipo(request,equipo):
 	delanteros = Contrato.objects.filter(equipo=equipo, posicion='delantero', fec_fin__isnull=True).order_by('dorsal')
 	dt = Contrato.objects.filter(equipo=equipo, posicion='dt', fec_fin__isnull=True).order_by('dorsal')
 
-	partidos = Partido.objects.filter(Q(local=equipo) | Q(visita=equipo)).exclude(terminado=False).order_by('-fecha')[0:25]
+	partidos = Partido.objects.filter(Q(local=equipo) | Q(visita=equipo)).exclude(terminado=False).order_by('-fecha')[0:100]
 
 	vector_p = ''
 	for p in partidos:
@@ -558,10 +575,9 @@ def equipo(request,equipo):
 
 	stats = [conteo,ganes,empates,perdidos]
 
-
-
-
 	return render(request,'equipo.html',{'cats':cats,'this_equipo':equipo,'arqueros':arqueros,'defensas':defensas, 'centros':centros,'delanteros':delanteros,'vector_p':vector_p,'stats':stats,'dt':dt,'ligas':ligas,'partidos':partidos})
+
+
 
 
 def nomina(request,equipo):
@@ -619,6 +635,33 @@ def liga(request,liga):
 
 	return render(request,'liga.html',{'cats':cats,'this_liga':this_liga,'pp':pp,'pt':pt,'ligas':ligas,'tabla':tabla})
 
+
+def ligaEquipo(request,liga,equipo):
+	ligas = Torneo.objects.all().order_by('-id')
+	this_liga = Torneo.objects.get(pk=int(liga))
+	this_equipo = Equipo.objects.get(pk=int(equipo))
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	pt = Partido.objects.filter(torneo=this_liga, terminado=True).filter(Q(local=this_equipo) | Q(visita=this_equipo)).order_by('-fecha','id')
+	tabla = None
+	if pt:
+		tabla = Partido.objects.raw(f"select * from posiciones where id={this_liga.id} order by pts desc, DG desc, GF desc, PJ desc")
+
+	return render(request,'liga-equipo.html',{'cats':cats,'npars':len(pt),'this_liga':this_liga,'this_equipo':this_equipo,'pt':pt,'ligas':ligas})
+
+def ligaFase(request,liga,fase):
+	ligas = Torneo.objects.all().order_by('-id')
+	this_liga = Torneo.objects.get(pk=int(liga))
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	pp = Partido.objects.filter(torneo=this_liga, terminado=False).order_by('fecha','id')
+	pt = Partido.objects.filter(torneo=this_liga, terminado=True, fase=fase).order_by('-fecha','id')
+	tabla = None
+	if pt:
+		tabla = Partido.objects.raw(f"select * from posiciones where id={this_liga.id} order by pts desc, DG desc, GF desc, PJ desc")
+
+	return render(request,'liga-fase.html',{'fase':fase, 'cats':cats,'npars':len(pt),'this_liga':this_liga,'pt':pt,'ligas':ligas,'tabla':tabla})
+
+
+
 def addMatch(request,liga):
 	this_liga = Torneo.objects.get(pk=int(liga))
 	ligas = Torneo.objects.all().order_by('-id')
@@ -654,11 +697,9 @@ def partido(request,p):
 
 	goles = Gol.objects.filter(partido=this_partido).order_by('minuto','adicional')
 
-	if this_partido.local.id in [1,2,3]:
-		contratos_l = Contrato.objects.filter(equipo=this_partido.local, fec_fin__isnull=True).order_by('jugador__nombre')
+	contratos_l = Contrato.objects.filter(equipo=this_partido.local, fec_fin__isnull=True).order_by('jugador__nombre')
 
-	if this_partido.visita.id in [1,2,3]:
-		contratos_v = Contrato.objects.filter(equipo=this_partido.visita, fec_fin__isnull=True).order_by('jugador__nombre')
+	contratos_v = Contrato.objects.filter(equipo=this_partido.visita, fec_fin__isnull=True).order_by('jugador__nombre')
 
 
 	next_m = Partido.objects.filter(torneo=this_partido.torneo, fecha__gte=this_partido.fecha,terminado=False).exclude(id=this_partido.id).order_by('fecha','id')
@@ -673,7 +714,7 @@ def partido(request,p):
 		if len(marcador)==4:
 			pl = marcador[2].strip()
 			pv = marcador[3].strip()
-			
+
 
 
 		this_partido.goles_local = int(goles_local)
@@ -772,7 +813,7 @@ def regGol(request):
 			penalty = False
 
 	if autogol == True:
-		this_contrato = Contrato.objects.get(pk=4)
+		this_contrato = Contrato.objects.get(pk=52)
 
 
 	newG = Gol.objects.create(partido=this_partido,
@@ -826,14 +867,18 @@ def alineacion(request,partido,equipo):
 		return redirect(f"/alineacion/{this_partido.id}/{this_equipo.id}")
 
 
-	return render(request,'alineacion.html',{'this_partido':this_partido,'contratos':contratos,'ligas':ligas,'alineaciones':these_alineaciones})
+	return render(request,'alineacion.html',{'this_partido':this_partido,'contratos':contratos,'ligas':ligas,'this_equipo':this_equipo,'alineaciones':these_alineaciones})
 
 
 def journal(request):
 	get_y = request.GET.get('y', 1)
-	max_year = JournalEntry.objects.all().order_by('-fecha').first()
+	conteo = JournalEntry.objects.all().count()
+	if conteo > 0:
+		max_year = JournalEntry.objects.all().order_by('-fecha').first()
+	else:
+		max_year = 0
 
-	this_y = max_year.fecha.year if int(get_y) == 1 else int(get_y)
+	this_y = max_year.fecha.year if int(get_y) == 1 and conteo > 0 else int(get_y)
 
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	entries = JournalEntry.objects.filter(fecha__year=this_y).order_by('-fecha','-id')

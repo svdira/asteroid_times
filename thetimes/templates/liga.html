@@ -24,7 +24,7 @@
     {% for t in tabla %}
   <tr>
     <td>{{ forloop.counter }}</td>
-    <td><a href="{% url 'equipo' t.equipo_id %}" style="text-decoration: none; color: black;">{{t.Equipo}}</a></td>
+    <td><a href="{% url 'ligaEquipo' this_liga.id t.equipo_id %}" style="text-decoration: none; color: black;">{{t.Equipo}}</a></td>
     <td>{{t.Pts}}</td>
     <td>{{t.PJ}}</td>
     <td>{{t.PG}}</td>
@@ -40,12 +40,14 @@
 
   <h3>Coming Matches</h3>
   {% for p in pp %}
-   <a href="{% url 'partido' p.id %}" style="text-decoration:none;">
+   
         <div class="match-card">
           <div class="match-meta">
             <span class="match-date">{{p.fecha}}</span>
-            <span class="match-league">{{p.fase}}</span>
+            <span class="match-league"> {{p.fase}}</span>
           </div>
+
+          <a href="{% url 'partido' p.id %}" style="text-decoration:none;">
 
           <div class="match-body">
             <div class="team home">
@@ -61,9 +63,9 @@
             <div class="team away">
               <span class="team-name">{{p.visita.nombre}}</span>
             </div>
-          </div>
+          </div></a>
         </div>
-      </a>
+      
         <br>
   {% endfor %}
 
@@ -79,13 +81,13 @@
   <h3>Finished Matches</h3>
 
   {% for p in pt %}
-    <a href="{% url 'partido' p.id %}" style="text-decoration:none;">
+  
         <div class="match-card">
           <div class="match-meta">
             <span class="match-date">{{p.fecha}}</span>
-            <span class="match-league">{{p.fase}}</span>
+            <span class="match-league"><a href="{% url 'ligaFase' this_liga.id p.fase %}" style="text-decoration:none; color:blue;">{{p.fase}}</a></span>
           </div>
-
+          <a href="{% url 'partido' p.id %}" style="text-decoration:none;">
           <div class="match-body">
             <div class="team home">
               <span class="team-name">{{p.local.nombre}}</span>
@@ -101,9 +103,9 @@
             <div class="team away">
               <span class="team-name">{{p.visita.nombre}}</span>
             </div>
-          </div>
+          </div></a>
         </div>
-      </a>
+      
         <br>
   {% endfor %}
 

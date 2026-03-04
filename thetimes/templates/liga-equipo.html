@@ -1,27 +1,21 @@
 {% extends 'base_times.html' %}
 {% load static %}
 
-{% block titulo %}{{this_equipo.nombre}}'s Page{% endblock %}
+{% block titulo %}{{this_liga.nombre}}'s Page{% endblock %}
 
 {% block izquierda %}
 
 
-<h2>{{this_equipo.nombre}}'s Main Page | <a href="{% url 'nomina' this_equipo.id %}">Team</a></h2>
 
+{% if pt %}
+  <h3>{{this_equipo.nombre}} @ {{this_liga.nombre}} ({{npars}})</h3>
 
-
-{% if partidos %}
-
-<h3>Last {{stats.0}} Matches: {{stats.1}}W/{{stats.2}}D/{{stats.3}}L</h3>
-<p><span style="font-family:Arial,sans-serif;">{{vector_p|slice:":5"}}</span></p>
-<h3>Last Matches</h3>
-
-  {% for p in partidos %}
-   <a href="{% url 'partido' p.id %}" style="text-decoration:none;">
-  <div class="match-card">
+  {% for p in pt %}
+    <a href="{% url 'partido' p.id %}" style="text-decoration:none;">
+        <div class="match-card">
           <div class="match-meta">
             <span class="match-date">{{p.fecha}}</span>
-            <span class="match-league">{{p.torneo.nombre}} ({{p.fase}})</span>
+            <span class="match-league">{{p.fase}}</span>
           </div>
 
           <div class="match-body">
@@ -40,18 +34,20 @@
               <span class="team-name">{{p.visita.nombre}}</span>
             </div>
           </div>
-        </div></a>
+        </div>
+      </a>
         <br>
   {% endfor %}
+
 {% endif %}
 
 
 
+
+
+
+
 {% endblock %}
-
-
-
-
 
 
 {% block derecha %}
@@ -67,6 +63,7 @@
     {% endfor %}
 
 </ul>
+
 
 
 {% endblock %}

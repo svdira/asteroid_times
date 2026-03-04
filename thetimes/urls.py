@@ -23,6 +23,8 @@ urlpatterns = [
 	path('equipo/<equipo>', views.equipo, name='equipo'),
 	path('nomina/<equipo>', views.nomina, name='nomina'),
 	path('liga/<liga>', views.liga, name='liga'),
+	path('liga-equipo/<liga>/<equipo>', views.ligaEquipo, name='ligaEquipo'),
+	path('liga-fase/<liga>/<fase>', views.ligaFase, name='ligaFase'),
 	path('add-match/<liga>', views.addMatch, name='addMatch'),
 	path('partido/<p>', views.partido, name='partido'),
 	path('futbol/<p>', views.futbol, name='futbol'),
@@ -49,4 +51,5 @@ urlpatterns = [
 	path('view-photos/<i>/<w>', views.viewphotos, name='viewphotos'),
 	path('quemar/<i>', views.quemar, name='quemar'),
 	path('add-nota-partido/<p>', views.addnotapartido, name='addnotapartido'),
+	path('add-contrato-rapido/', views.addContratoShort, name='addContratoShort'),
 	]
