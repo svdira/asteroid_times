@@ -131,9 +131,21 @@ class Item(models.Model):
         if inicio==0 and fin>0:
             this_v = f"({fin})"
 
-
-
         return this_v
+
+    @property
+    def paisOrigen(self):
+        origen = ''
+        conteo = Atributos.objects.filter(item=self,nombre__in=['origen','pais']).count()
+
+        if conteo > 0:
+            atributo = Atributos.objects.filter(item=self,nombre__in=['origen','pais']).latest('id')
+            origen = atributo.texto
+
+        return origen
+
+
+       
 
     @property
     def mainPic(self):

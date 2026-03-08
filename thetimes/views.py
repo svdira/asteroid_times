@@ -295,6 +295,9 @@ def startConsumo(request,i):
 	if this_item.tipo.category.lower() in ['anime','tv series','season']:
 		formatos = ['streaming','download','theater','cd/dvd/lp']
 		units = ['episodes']
+	if this_item.tipo.category.lower() in ['beer']:
+		formatos = ['lata','botella','tacon alto','chola']
+		units = ['bebida']
 
 
 	if request.method == 'POST':
@@ -1192,4 +1195,29 @@ def quemar(request,i):
     Item.objects.filter(id=int(i)).update(consumido=True)
     return redirect(f'/item/{i}')
 
+
+def beerlog(request):
+	beers = Item.objects.filter(tipo__category='Beer').order_by('-fecha_edicion')
+
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	return render(request,'beer.html',{'beers':beers,'cats':cats,'nbeers':len(beers)})
+
+def logbeer(request,t):
+
+	this_beer = Item.objects.get(pk=int(t))
+
+
+	newC = Consumo.objects.create(item=this_beer,
+				fec_ini=datetime.today().date(),
+				fec_fin = datetime.today().date(),
+				formato='cerveza',
+				unidades = 'bebida',
+				cantidad=1,
+				multiplicador=1,
+				consumo=1)
+	newC.save()
+	this_beer.consumido = True
+	this_beer.fecha_edicion = datetime.now()
+	this_beer.save()
+	return redirect(f"/item/{this_beer.id}")
 

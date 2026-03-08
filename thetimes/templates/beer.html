@@ -1,0 +1,37 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}The Times | Beers {% endblock %}
+
+{% block izquierda %}
+
+<h2>Beer Log ({{nbeers}})</h2>
+<br>
+
+
+ <ul class="styled-list">
+  {% for b in beers %}
+    <li>
+      <span class="main-item"><a href="{% url 'item' b.id %}" style="text-decoration:none; color:black;">{{b.titulo}} ({{b.paisOrigen}})</a></span>
+      <small class="sub-item"> {{b.fecha_edicion}}</small>
+    </li>
+  {% endfor %}
+  </ul>
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<h2>Categories:</h2>
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+  
+</ul>
+{% endblock %}

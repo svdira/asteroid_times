@@ -52,4 +52,6 @@ urlpatterns = [
 	path('quemar/<i>', views.quemar, name='quemar'),
 	path('add-nota-partido/<p>', views.addnotapartido, name='addnotapartido'),
 	path('add-contrato-rapido/', views.addContratoShort, name='addContratoShort'),
+	path('beer-log/', views.beerlog, name='beerlog'),
+	path('log-beer/<t>/', views.logbeer, name='logbeer'),
 	]
