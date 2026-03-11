@@ -40,7 +40,11 @@ def addItem(request):
 
 		return redirect(f'/edit-item/{newI.id}')
 
-	return render(request,'add-item.html',{'cats':cats})
+	return render(request,'add.html',{'cats':cats})
+
+def addMovie(request):
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	return render(request,'add-movie.html',{'cats':cats})
 
 def editItem(request,i):
 	wiki = request.GET.get('wiki', 0)
@@ -1197,7 +1201,7 @@ def quemar(request,i):
 
 
 def beerlog(request):
-	beers = Item.objects.filter(tipo__category='Beer').order_by('-fecha_edicion')
+	beers = Item.objects.filter(tipo__category='Beer', consumido=True).order_by('-fecha_edicion')
 
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	return render(request,'beer.html',{'beers':beers,'cats':cats,'nbeers':len(beers)})
@@ -1220,4 +1224,59 @@ def logbeer(request,t):
 	this_beer.fecha_edicion = datetime.now()
 	this_beer.save()
 	return redirect(f"/item/{this_beer.id}")
+
+def addBeer(request):
+	return render(request,'add-beer.html',{})
+
+def addTimesItem(request):
+	cats = sorted(Category.objects.exclude(id__in=[1,2,20,14]),key=lambda t: t.nitems, reverse=True)
+
+	if request.method == 'POST':
+		titulo = request.POST.get("titulo")
+		cat_id = request.POST.get("category")
+		categoria = Category.objects.get(pk=int(cat_id))
+		contenido = request.POST.get("contenido")
+
+		if categoria.category.lower() in ['book','bunko','manga series','comic book','movie','anime','tv series','season','persona','album','band']:
+		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
+		    newI.save()
+		else:
+		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
+		    newI.save()
+
+
+		return redirect(f'/edit-item/{newI.id}')
+
+	return render(request,'add-times-item.html',{'cats':cats})
+
+
+def addBook(request):
+	cat = Category.objects.get(pk=1)
+	authors = Item.objects.filter(tipo__category='Persona').order_by('titulo')
+	if request.method == 'POST':
+		titulo = request.POST.get("titulo")
+		contenido = request.POST.get("contenido")
+		author_id = request.POST.get("author_id")
+		autor = Item.objects.get(pk=int(author_id))
+
+		newI = Item.objects.create(titulo=titulo,tipo=cat,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
+		newI.save()
+
+		photo = request.FILES.get("imagen")
+
+		newIimg = AttrImage.objects.create(item=newI, imagen=photo,caption='tba',tipo='cover')
+		newIimg.save()
+
+		newAtt = Atributos.objects.create(item=newI,orden=1,tipo='int',nombre='pubyear',entero=int(request.POST.get("pubyear")))
+		newAtt.save()
+
+		newRel = AttrItem.objects.create(item=autor,child=newI,rel_name='author')
+		newRel.save()
+
+		return redirect(f'/item/{newI.id}')
+
+	return render(request,'add-book.html',{'authors':authors})
+
+
+
 

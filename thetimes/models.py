@@ -444,6 +444,65 @@ class NotaPartido(models.Model):
     def __str__(self):
         return self.minuto+ ' @ '+ self.partido.headline
 
+class Beer(models.Model):
+    nombre = models.CharField(max_length=255)
+    origen = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=255)
+    graduacion = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.nombre +' @ '+self.origen
+
+class BeerLog(models.Model):
+    cerveza = models.ForeignKey(Beer, on_delete=models.CASCADE)
+    fecha = models.DateTimeField()
+
+    def __str__(self):
+        return self.cerveza.nombre
+
+
+class Album(models.Model):
+    titulo = models.CharField(max_length=255)
+    artista = models.CharField(max_length=255)
+    anho = models.IntegerField()
+    imagen = models.ImageField(upload_to=path_and_name, max_length=255, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.imagen:
+            img_path = self.imagen.path
+            thumb_path = os.path.join(os.path.dirname(img_path),
+                "thumbnails/" + os.path.basename(img_path))
+            img = Image.open(img_path)
+            img.thumbnail((400, 400))  # <--- thumbnail size
+            img.save(thumb_path)
+
+    @property
+    def thumbnail_path(self):
+        parts = self.imagen.url.split('/')
+        parts.insert(3, 'thumbnails')
+        result = '/'.join(parts)
+        return result
+
+    def __str__(self):
+        return self.titulo +' @ '+self.artista
+
+class Song(models.Model):
+    album = models.ForeignKey(Album, on_delete=models.CASCADE)
+    titulo_cancion =  models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.titulo_cancion +' @ '+self.album.nombre
+
+
+class AlbumLog(models.Model):
+    cerveza = models.ForeignKey(Beer, on_delete=models.CASCADE)
+    fecha = models.DateTimeField()
+
+    def __str__(self):
+        return self.cerveza.nombre
+
+
 
 
 

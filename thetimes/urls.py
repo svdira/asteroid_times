@@ -54,4 +54,11 @@ urlpatterns = [
 	path('add-contrato-rapido/', views.addContratoShort, name='addContratoShort'),
 	path('beer-log/', views.beerlog, name='beerlog'),
 	path('log-beer/<t>/', views.logbeer, name='logbeer'),
+	path('add-movie/', views.addMovie, name='addmovie'),
+	path('add-beer/', views.addBeer, name='addbeer'),
+	path('add-times-item/', views.addTimesItem, name='addtimesitem'),
+	path('add-book/', views.addBook, name='addbook'),
+	
+
+
 	]
