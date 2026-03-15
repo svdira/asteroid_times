@@ -1223,9 +1223,45 @@ def logbeer(request,t):
 	this_beer.consumido = True
 	this_beer.fecha_edicion = datetime.now()
 	this_beer.save()
-	return redirect(f"/item/{this_beer.id}")
+	return redirect("/beer-log/")
 
 def addBeer(request):
+	if request.method == 'POST':
+		categoria = Category.objects.get(pk=11)
+		post_nombre = request.POST.get("nombre")
+		post_tipo =  request.POST.get("tipo")
+		post_graduacion =  request.POST.get("graduacion")
+		post_origen =  request.POST.get("origen")
+		post_contenido = request.POST.get("contenido")
+		newItem = Item.objects.create(titulo = post_nombre,
+			tipo = categoria,
+			contenido = post_contenido,
+			fecha_creacion='1999-12-31', 
+			fecha_edicion='1999-12-31')
+
+		newAtt = Atributos.objects.create(item=newItem,
+			orden=1,
+			tipo='txt',
+			nombre='origen',
+			texto=post_origen)
+		newAtt.save()
+
+		newAtt = Atributos.objects.create(item=newItem,
+			orden=2,
+			tipo='dec',
+			nombre='graduacion',
+			decimal=post_graduacion)
+		newAtt.save()
+
+		newAtt = Atributos.objects.create(item=newItem,
+			orden=3,
+			tipo='txt',
+			nombre='tipo',
+			texto=post_tipo)
+		newAtt.save()
+
+		return redirect(f"/item/{newItem.id}")
+
 	return render(request,'add-beer.html',{})
 
 def addTimesItem(request):
@@ -1276,6 +1312,60 @@ def addBook(request):
 		return redirect(f'/item/{newI.id}')
 
 	return render(request,'add-book.html',{'authors':authors})
+
+def addAlbum(request):
+	if request.method == 'POST':
+		photo = request.FILES.get("imagen")
+		newAlbum = Album.objects.create(titulo = request.POST.get("titulo"),
+			artista = request.POST.get("artista"),
+			anho = int(request.POST.get("anho")),
+			imagen = photo,
+			last_played=datetime.now())
+		return redirect(f"/album/{newAlbum.id}")
+	return render(request,'add-album.html',{})
+
+def album(request,album):
+	this_album = Album.objects.get(pk=int(album))
+	songs = Song.objects.filter(album=this_album)
+
+	return render(request,'album.html',{'this_album':this_album,'songs':songs})
+
+def logalbum(request,album):
+	this_album = Album.objects.get(pk=int(album))
+	newA = AlbumLog.objects.create(album = this_album, fecha = datetime.now() )
+	newA.save()
+	this_album.last_played = datetime.now()
+	this_album.save()
+	return redirect(f"/album/{this_album.id}")
+
+def addsong(request,album):
+	this_album = Album.objects.get(pk=int(album))
+	if request.method == 'POST':
+		songs = request.POST.get("contenido").split("\n")
+		for s in songs:
+			if len(s)>0:
+				newS = Song.objects.create(album = this_album,
+					titulo_cancion = s)
+				newS.save()
+		return redirect(f'/album/{this_album.id}')
+
+
+	return render(request,'add-songs.html',{'this_album':this_album})
+
+
+def albums(request):
+	page = request.GET.get('page', 1)
+	albums = Album.objects.all().order_by('-last_played')
+	paginator = Paginator(albums, 30)
+	resultados = paginator.get_page(page)
+	return render(request,'albums.html',{'wikis':resultados})
+
+def menu(request):
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	return render(request,'menu.html',{'cats':cats})
+
+
+
 
 
 

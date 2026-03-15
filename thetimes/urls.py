@@ -58,7 +58,12 @@ urlpatterns = [
 	path('add-beer/', views.addBeer, name='addbeer'),
 	path('add-times-item/', views.addTimesItem, name='addtimesitem'),
 	path('add-book/', views.addBook, name='addbook'),
-	
+	path('add-album/', views.addAlbum, name='addAlbum'),
+	path('album/<album>', views.album, name='album'),
+	path('add-song/<album>', views.addsong, name='addsong'),
+	path('log-album/<album>', views.logalbum, name='logalbum'),
+	path('albums/', views.albums, name='albums'),
+	path('menu/', views.menu, name='menu'),
 
 
 	]

@@ -1,0 +1,47 @@
+{% extends 'base_wiki.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<div class="form-card">
+
+
+	<h2><a href='#' style='text-decoration: none; color: #007bff;'>{{this_album.titulo}}</a></h2>
+
+	<p style="font-family:Arial,Helvetica,sans-serif;"><a href="{% url 'logalbum' this_album.id %}" style="text-decoration: none; color:grey;">Listen</a> | <a href="{% url 'addsong' this_album.id %}" style="text-decoration: none; color:grey;">Add Songs</a> | Last Played: {{this_album.last_played|date:"F j, Y"}} </p>
+
+
+	
+
+
+	 <div class="tech-details">
+	    <div class="tech-title">{{this_album.titulo}}</div>
+
+	    <dl>
+	    
+	    	<dd><img src="{{this_album.imagen.url}}" class='tech-image' style="width: 100%;"></dd>
+
+	    	<dt>Artist</dt>
+	    	<dd>{{this_album.artista}}</dd>
+
+	    	<dt>Year</dt>
+	    	<dd>{{this_album.anho}}</dd>
+	
+
+	    </dl>
+	</div>
+
+
+{% if songs %}
+<p>
+	{% for s in songs %}
+	{{ forloop.counter }}. {{s.titulo_cancion}}<br>
+	{% endfor %}
+</p>
+{% endif %}
+
+      <div style="clear:both;"></div>
+
+</div>
+
+{% endblock %}

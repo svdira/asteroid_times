@@ -466,6 +466,7 @@ class Album(models.Model):
     artista = models.CharField(max_length=255)
     anho = models.IntegerField()
     imagen = models.ImageField(upload_to=path_and_name, max_length=255, null=True, blank=True)
+    last_played = models.DateTimeField(null = True, blank=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -492,11 +493,11 @@ class Song(models.Model):
     titulo_cancion =  models.CharField(max_length=255)
 
     def __str__(self):
-        return self.titulo_cancion +' @ '+self.album.nombre
+        return self.titulo_cancion +' @ '+self.album.titulo
 
 
 class AlbumLog(models.Model):
-    cerveza = models.ForeignKey(Beer, on_delete=models.CASCADE)
+    album = models.ForeignKey(Album, on_delete=models.CASCADE)
     fecha = models.DateTimeField()
 
     def __str__(self):

@@ -5,7 +5,7 @@
 
 {% block izquierda %}
 
-<h2>Beer Log ({{nbeers}})</h2>
+<h2>Beer Log ({{nbeers}}) | <a href="{% url 'addbeer' %}">Add Beer</a></h2>
 <br>
 
 
@@ -13,7 +13,7 @@
   {% for b in beers %}
     <li>
       <span class="main-item"><a href="{% url 'item' b.id %}" style="text-decoration:none; color:black;">{{b.titulo}} ({{b.paisOrigen}})</a></span>
-      <small class="sub-item"> {{b.fecha_edicion}}</small>
+      <small class="sub-item"> {{b.fecha_edicion|date:"F j, Y"}}</small>
     </li>
   {% endfor %}
   </ul>

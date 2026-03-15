@@ -21,6 +21,9 @@ admin.site.register(JournalEntry)
 admin.site.register(Tweet)
 admin.site.register(BarraProgreso)
 admin.site.register(Atributos)
+admin.site.register(Album)
+admin.site.register(Song)
+admin.site.register(AlbumLog)
 
 
 

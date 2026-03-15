@@ -1,0 +1,59 @@
+{% extends 'base_times.html' %}
+{% load static %}
+
+{% block titulo %}Add New Item{% endblock %}
+
+{% block izquierda %}
+
+
+<h2>New Item</h2>
+<br>
+ <ul class="styled-list">
+  
+    <li>
+      <span class="main-item"><a href="/book-history/" style="text-decoration:none; color:black;">Books</a></span>
+    </li>
+    <li>
+      <span class="main-item"><a href="/movie-history/" style="text-decoration:none; color:black;"> Movies</a></span>
+    </li>
+    <li>
+      <span class="main-item"><a href="/journal/" style="text-decoration:none; color:black;">Journal</a></span>
+    </li>
+    <li>
+      <span class="main-item"><a href="/futbol/0" style="text-decoration:none; color:black;">Fútbol</a></span>
+    </li>
+
+     <li>
+      <span class="main-item"><a href="/wikis/" style="text-decoration:none; color:black;">Wikis</a></span>
+    </li>
+
+    <li>
+      <span class="main-item"><a href="/albums/" style="text-decoration:none; color:black;">Albums</a></span>
+    </li>
+
+    <li>
+      <span class="main-item"><a href="/beer-log/" style="text-decoration:none; color:black;">Beer Log</a></span>
+    </li>
+
+  </ul>
+  
+
+
+
+
+{% endblock %}
+
+
+{% block derecha %}
+
+<ul class="list-group">
+    {% for c in cats %}
+      {% if c.nitems > 0 %}
+        <li class="list-group-item"><a href="{% url 'categoria' c.id %}" style="text-decoration:none; color:black;">{{c.category|capfirst}}</a> <span class="badge badge-pill">{{c.nitems}}</span></li>
+      {% endif %}
+    {% endfor %}
+
+</ul>
+
+
+{% endblock %}
