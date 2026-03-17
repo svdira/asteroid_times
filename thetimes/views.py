@@ -30,7 +30,7 @@ def addItem(request):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		if categoria.category.lower() in ['book','bunko','manga series','comic book','movie','anime','tv series','season','persona','album','band']:
+		if categoria.category.lower() in ['book','bunko','manga series','comic book','movie','anime season','anime film','tv series','show season','persona','album','band']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
 		    newI.save()
 		else:
@@ -206,6 +206,9 @@ def categoria(request,c):
 
 def item(request,i):
 	this_item = Item.objects.get(pk=int(i))
+	es_parent = 0
+	if this_item.tipo.category in ['TV Series','Book List','Collection','Book Series','Anime Series','Anime Film','Bunko Series','Manga Series']:
+		es_parent = 1
 	atributos = Atributos.objects.filter(item=this_item).order_by('orden')
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	ncon = Consumo.objects.filter(item = this_item, fec_fin__isnull=True).count()
@@ -221,7 +224,7 @@ def item(request,i):
 	tweets = Tweet.objects.filter(item=this_item)
 
 	tipos = []
-	cats_show_ratio = ['Book', 'Bunko', 'Manga Volume', 'Season', 'Anime']
+	cats_show_ratio = ['Book', 'Bunko', 'Manga Volume', 'Show Season', 'Anime Season','Anime Film']
 	categories = AttrItem.objects.filter(item=this_item).values_list('child__tipo__category', flat=True).distinct()
 	for cat in categories:
 		if this_item.tipo.category.lower() != 'book list':
@@ -275,7 +278,7 @@ def item(request,i):
 		enlaces_c = enlaces_c[:-7]
 
 
-	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'natt':len(atributos),'atributos':atributos,'cons':con_in_prog,'conteo_r':conteo_rel,'conteo_p':conteo_pars,'parents':parents,'enlaces_d':enlaces_d,'enlaces_c':enlaces_c,'tipos':tipos,'cats_show_ratio':cats_show_ratio})
+	return render(request,'item.html',{'this_item':this_item,'tweets':tweets,'cats':cats,'natt':len(atributos),'atributos':atributos,'es_parent':es_parent,'cons':con_in_prog,'conteo_r':conteo_rel,'conteo_p':conteo_pars,'parents':parents,'enlaces_d':enlaces_d,'enlaces_c':enlaces_c,'tipos':tipos,'cats_show_ratio':cats_show_ratio})
 
 def startConsumo(request,i):
 	this_item = Item.objects.get(pk=int(i))
@@ -296,7 +299,7 @@ def startConsumo(request,i):
 		formatos = ['streaming','download','theater','cd/dvd/lp']
 		units = ['minutes']
 
-	if this_item.tipo.category.lower() in ['anime','tv series','season']:
+	if this_item.tipo.category.lower() in ['anime season','tv series','show season','anime film']:
 		formatos = ['streaming','download','theater','cd/dvd/lp']
 		units = ['episodes']
 	if this_item.tipo.category.lower() in ['beer']:
@@ -433,7 +436,7 @@ def relatedItems(request,item):
 	this_item = Item.objects.get(pk=int(item))
 
 	tipos = []
-	cats_show_ratio = ['Book', 'Bunko', 'Manga Volume', 'Season', 'Anime']
+	cats_show_ratio = ['Book', 'Bunko', 'Manga Volume', 'Show Season', 'Anime Season','Anime Film']
 	categories = AttrItem.objects.filter(item=this_item).values_list('child__tipo__category', flat=True).distinct()
 	for cat in categories:
 		items_cat = sorted(AttrItem.objects.filter(item=this_item, child__tipo__category=cat),  key=lambda t: t.child.periodo, reverse=False)
@@ -455,7 +458,7 @@ def addChildItem(request, parent):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime','tv series','season','persona','band','album']:
+		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime season','anime film','tv series','show season','persona','band','album']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
 		    newI.save()
 		else:
@@ -660,8 +663,8 @@ def ligaFase(request,liga,fase):
 	ligas = Torneo.objects.all().order_by('-id')
 	this_liga = Torneo.objects.get(pk=int(liga))
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
-	pp = Partido.objects.filter(torneo=this_liga, terminado=False).order_by('fecha','id')
-	pt = Partido.objects.filter(torneo=this_liga, terminado=True, fase=fase).order_by('-fecha','id')
+	pp = Partido.objects.filter(torneo=this_liga, fase = fase).order_by('fecha','id')
+	pt = Partido.objects.filter(torneo=this_liga, fase=fase).order_by('-fecha','id')
 	tabla = None
 	if pt:
 		tabla = Partido.objects.raw(f"select * from posiciones where id={this_liga.id} order by pts desc, DG desc, GF desc, PJ desc")
@@ -1273,7 +1276,7 @@ def addTimesItem(request):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		if categoria.category.lower() in ['book','bunko','manga series','comic book','movie','anime','tv series','season','persona','album','band']:
+		if categoria.category.lower() in ['book','bunko','manga series','comic book','movie','anime season','anime film','tv series','show season','persona','album','band']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
 		    newI.save()
 		else:
@@ -1312,6 +1315,33 @@ def addBook(request):
 		return redirect(f'/item/{newI.id}')
 
 	return render(request,'add-book.html',{'authors':authors})
+
+def addbunko(request):
+	cat = Category.objects.get(pk=1)
+	authors = Item.objects.filter(tipo__category='Bunko Series').order_by('titulo')
+	if request.method == 'POST':
+		titulo = request.POST.get("titulo")
+		contenido = request.POST.get("contenido")
+		author_id = request.POST.get("author_id")
+		autor = Item.objects.get(pk=int(author_id))
+
+		newI = Item.objects.create(titulo=titulo,tipo=cat,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
+		newI.save()
+
+		photo = request.FILES.get("imagen")
+
+		newIimg = AttrImage.objects.create(item=newI, imagen=photo,caption='tba',tipo='cover')
+		newIimg.save()
+
+		newAtt = Atributos.objects.create(item=newI,orden=1,tipo='int',nombre='pubyear',entero=int(request.POST.get("pubyear")))
+		newAtt.save()
+
+		newRel = AttrItem.objects.create(item=autor,child=newI,rel_name='volume')
+		newRel.save()
+
+		return redirect(f'/item/{newI.id}')
+
+	return render(request,'add-bunko.html',{'authors':authors})
 
 def addAlbum(request):
 	if request.method == 'POST':
@@ -1363,6 +1393,40 @@ def albums(request):
 def menu(request):
 	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
 	return render(request,'menu.html',{'cats':cats})
+
+def addseason(request):
+	cats = Category.objects.filter(id__in=[5,12,27])
+	authors = Item.objects.filter(tipo__category='Persona').order_by('titulo')
+	if request.method == 'POST':
+		post_titulo = request.POST.get("titulo")
+		post_premiere = request.POST.get("premiere-date")
+		post_finale = request.POST.get("finale-date")
+		post_tipo = request.POST.get("cat_id")
+		categoria = Category.objects.get(pk=int(post_tipo))
+		post_eps = request.POST.get("n-episodes")
+		post_contenido = request.POST.get("contenido")
+
+
+		newI = Item.objects.create(titulo=post_titulo,tipo=categoria,contenido=post_contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
+		newI.save()
+
+		photo = request.FILES.get("imagen")
+
+		newIimg = AttrImage.objects.create(item=newI, imagen=photo,caption='tba',tipo='cover')
+		newIimg.save()
+
+		newAtt = Atributos.objects.create(item=newI,orden=1,tipo='fec',nombre='premiere',fecha=post_premiere)
+		newAtt.save()
+
+		newAtt = Atributos.objects.create(item=newI,orden=2,tipo='fec',nombre='finale',fecha=post_finale)
+		newAtt.save()
+
+		newAtt = Atributos.objects.create(item=newI,orden=3,tipo='int',nombre='episodes',entero=post_eps)
+		newAtt.save()	
+
+		return redirect(f'/item/{newI.id}')
+
+	return render(request,'add-season.html',{'cats':cats})
 
 
 

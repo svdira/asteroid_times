@@ -432,7 +432,6 @@ tbody tr:last-child td {
 }
 
 
-
 .tech-details {
     float: right;
     width: 280px;
@@ -443,6 +442,13 @@ tbody tr:last-child td {
     font-family: var(--font-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
     font-size: 0.9rem;
     line-height: 1.4;
+}
+
+
+.tech-image {
+    width: 100%;
+
+    border:1px solid grey;
 }
 
 .tech-title {
@@ -519,5 +525,26 @@ tbody tr:last-child td {
         padding: 20px;
     }
 
+
+}
+
+
+/* Responsive */
+@media (max-width: 700px) {
+
+
+.tech-details {
+
+position:relative;
+margin: 1em auto;
+width: 100%;}
+
+
+.tech-image {
+
+    display: block;
+    max-width: 75%;
+    margin: 0 auto;
+}
 
 }

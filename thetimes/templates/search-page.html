@@ -53,7 +53,7 @@
     <hr>
         {% if rt %}
          {% for a in rt %}
-            {% if a.credit_links %}<p> {{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %} | By {{a.credit_links|safe}}
+            <p> {{a.titulo}}{% if a.periodo %}&nbsp;{{a.periodo}}{% endif %}{% if a.credit_links %} | By {{a.credit_links|safe}}{% endif %} | {{a.tipo.category}}
 
             <form method="POST" action="/edit-item/{{a.id}}">  {% csrf_token %}
                 <input type='hidden' name="item_id" value='{{lista}}'>
@@ -64,7 +64,7 @@
             </form>
 
 
-            </p>{% endif %}
+            </p>
 
 
               <div style="clear:both;"></div>

@@ -5,7 +5,7 @@
 
 
 <div class="form-card">
-    <h2>Add New Book</h2>
+    <h2>Add New Light Novel Volume</h2>
 
     <form method="POST" enctype="multipart/form-data">
       {% csrf_token %}
@@ -16,7 +16,7 @@
 
 
         <div class="form-group">
-            <label>Author</label>
+            <label>Series</label>
             <select name="author_id">
                 {% for a in authors %}
                     <option value="{{a.id}}">{{a.titulo}}</option>

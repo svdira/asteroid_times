@@ -23,11 +23,21 @@
               <span class="team-name">{{p.local.nombre}}</span>
             </div>
 
+            {% if p.terminado == True %}
+
             <div class="score">
               <span class="goals">{{p.goles_local}}{% if p.rondap_local %}&nbsp;({{p.rondap_local}}{% endif %}</span>
               <span class="divider">–</span>
               <span class="goals">{% if p.rondap_visita%}{{p.rondap_visita}})&nbsp;{% endif %}{{p.goles_visita}}</span>
             </div>
+            {% else %}
+              <div class="score">
+              <span class="goals">&nbsp;</span>
+              <span class="divider">–</span>
+              <span class="goals">&nbsp;</span>
+            </div>
+
+            {% endif %}
 
 
             <div class="team away">

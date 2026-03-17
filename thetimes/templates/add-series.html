@@ -5,7 +5,7 @@
 
 
 <div class="form-card">
-    <h2>Add New Book</h2>
+    <h2>Add New Season of TV Series</h2>
 
     <form method="POST" enctype="multipart/form-data">
       {% csrf_token %}
@@ -16,10 +16,10 @@
 
 
         <div class="form-group">
-            <label>Author</label>
+            <label>Type</label>
             <select name="author_id">
-                {% for a in authors %}
-                    <option value="{{a.id}}">{{a.titulo}}</option>
+                {% for c in cats %}
+                    <option value="{{c.id}}">{{c.category}}</option>
                 {% endfor %}
             </select>
         </div>
