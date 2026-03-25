@@ -1,0 +1,24 @@
+{% extends 'base_wiki.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+<div class="form-card">
+    <h2>Add Characters to {{this_wiki.titulo}}</h2>
+    <form method="POST" enctype="multipart/form-data">
+    	{% csrf_token %}
+
+        <div class="form-group">
+            <label>Characters:</label>
+            <textarea name="contenido" rows="15"></textarea>
+        </div>
+
+    
+      
+        <button class="btn btn-primary">Add Chars</button>
+        
+    </form>
+</div>
+
+{% endblock %}

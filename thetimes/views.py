@@ -30,7 +30,7 @@ def addItem(request):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		if categoria.category.lower() in ['book','bunko','manga series','comic book','movie','anime season','anime film','tv series','show season','persona','album','band']:
+		if categoria.category.lower() in ['manga volume','book','bunko','manga series','comic book','movie','anime season','anime film','tv series','show season','persona','album','band']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
 		    newI.save()
 		else:
@@ -160,7 +160,7 @@ def editItem(request,i):
 
 def homepage(request):
 	page = request.GET.get('page', 1)
-	articles = Item.objects.exclude(tipo__id__in=[14,22,6,23,24,25]).order_by('-fecha_creacion')
+	articles = Item.objects.exclude(tipo__id__in=[3,8,11,14,22,6,23,24,25]).order_by('-fecha_creacion')
 	paginator = Paginator(articles, 12)
 	resultados = paginator.get_page(page)
 	cats = sorted(Category.objects.exclude(id__in=[22,6,23,24,25]),key=lambda t: t.nitems, reverse=True)
@@ -291,7 +291,7 @@ def startConsumo(request,i):
 		duracion = obj_duracion.att_value
 
 
-	if this_item.tipo.category.lower() in ['book','bunko','manga series','comic book']:
+	if this_item.tipo.category.lower() in ['manga volume','book','bunko','manga series','comic book']:
 		formatos = ['printed','kindle','boox','audiobook']
 		units = ['paginas','location','minutos','chapters']
 
@@ -458,7 +458,7 @@ def addChildItem(request, parent):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		if categoria.category.lower() in ['book','bunko','manga volume','comic book','movie','anime season','anime film','tv series','show season','persona','band','album']:
+		if categoria.category.lower() in ['manga volume','book','bunko','manga volume','comic book','movie','anime season','anime film','tv series','show season','persona','band','album']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
 		    newI.save()
 		else:
@@ -1239,7 +1239,7 @@ def addBeer(request):
 		newItem = Item.objects.create(titulo = post_nombre,
 			tipo = categoria,
 			contenido = post_contenido,
-			fecha_creacion='1999-12-31', 
+			fecha_creacion='1999-12-31',
 			fecha_edicion='1999-12-31')
 
 		newAtt = Atributos.objects.create(item=newItem,
@@ -1317,7 +1317,7 @@ def addBook(request):
 	return render(request,'add-book.html',{'authors':authors})
 
 def addbunko(request):
-	cat = Category.objects.get(pk=1)
+	cat = Category.objects.get(pk=9)
 	authors = Item.objects.filter(tipo__category='Bunko Series').order_by('titulo')
 	if request.method == 'POST':
 		titulo = request.POST.get("titulo")
@@ -1382,6 +1382,32 @@ def addsong(request,album):
 
 	return render(request,'add-songs.html',{'this_album':this_album})
 
+def addcharbatch(request,wiki):
+	this_wiki = Item.objects.get(pk=int(wiki))
+	categoria = Category.objects.get(pk=6)
+
+	if request.method == 'POST':
+		chars = request.POST.get("contenido").split("\n")
+		for s in chars:
+			if len(s)>0:
+				item = s.split(":")
+				if len(item) > 1:
+					ctitulo = item[0].strip()
+					ccontenido = item[1].strip() + "==headtext=="
+
+					newI = Item.objects.create(titulo=ctitulo,tipo=categoria,contenido=ccontenido,fecha_creacion=datetime.now(), fecha_edicion=datetime.now())
+					newI.save()
+
+					newRel = AttrItem.objects.create(item=this_wiki,child=newI,rel_name='wikipage')
+					newRel.save()
+
+		return redirect(f'/wiki/{this_wiki.id}')
+
+
+
+	return render(request,'add-char-batch.html',{'this_wiki':this_wiki})
+
+
 
 def albums(request):
 	page = request.GET.get('page', 1)
@@ -1422,7 +1448,7 @@ def addseason(request):
 		newAtt.save()
 
 		newAtt = Atributos.objects.create(item=newI,orden=3,tipo='int',nombre='episodes',entero=post_eps)
-		newAtt.save()	
+		newAtt.save()
 
 		return redirect(f'/item/{newI.id}')
 

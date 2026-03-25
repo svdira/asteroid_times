@@ -145,7 +145,7 @@ class Item(models.Model):
         return origen
 
 
-       
+
 
     @property
     def mainPic(self):
@@ -160,7 +160,7 @@ class Item(models.Model):
 
     @property
     def aplica_consumo(self):
-        if self.tipo.category.lower() in ['book','movie','bunko','anime season','show season','miniseries','anime film','manga series','album']:
+        if self.tipo.category.lower() in ['book','movie','bunko','anime season','show season','miniseries','anime film','manga series','album','manga volume']:
             return True
         else:
             return None
@@ -342,14 +342,14 @@ class Partido(models.Model):
     @property
     def headline(self):
         if self.terminado == False:
-            return self.local.nombre + ' v ' + self.visita.nombre 
+            return self.local.nombre + ' v ' + self.visita.nombre
         else:
             if (self.rondap_local +  self.rondap_visita) > 0:
                 m = f"{self.goles_local}({self.rondap_local}) - ({self.goles_visita}){self.goles_visita}"
             else:
                 m = f"{self.goles_local} - {self.goles_visita}"
 
-            return self.local.nombre + f' {m} ' + self.visita.nombre 
+            return self.local.nombre + f' {m} ' + self.visita.nombre
 
     @property
     def marcador(self):
@@ -484,6 +484,11 @@ class Album(models.Model):
         parts.insert(3, 'thumbnails')
         result = '/'.join(parts)
         return result
+
+    @property
+    def played(self):
+        conteo = AlbumLog.objects.filter(album=self).count()
+        return conteo
 
     def __str__(self):
         return self.titulo +' @ '+self.artista

@@ -66,6 +66,7 @@ urlpatterns = [
 	path('albums/', views.albums, name='albums'),
 	path('menu/', views.menu, name='menu'),
 	path('add-season/', views.addseason, name='addseason'),
+	path('add-char-batch/<wiki>', views.addcharbatch, name='addcharbatch'),
 
 
 	]
