@@ -548,3 +548,56 @@ width: 100%;}
 }
 
 }
+
+
+/* ===============================
+   GRID DE IMÁGENES
+================================ */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+/* Imágenes */
+.image-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+}
+
+/* ===============================
+   RESPONSIVE GRID
+================================ */
+@media (max-width: 768px) {
+    .image-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* Card de imagen */
+.image-card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Imagen */
+.image-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #dcdfe3; 
+}
+
+/* Texto debajo */
+.image-caption {
+    margin-top: 8px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    color: var(--text-main);
+    text-align: center;
+}

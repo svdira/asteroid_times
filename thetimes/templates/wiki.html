@@ -7,17 +7,30 @@
 
 
 	<h2>{{wiki.titulo}} <a href="{% url 'addwikipage' wiki.id %}" style="text-decoration:none; color:blue;">&#10010;</a> | <a href="{% url 'addcharbatch' wiki.id %}" style="text-decoration:none; color:blue;">Char Batch</a></h2>
-	<div class="table-wrapper">
-	  <table>
-	    <tbody>
-	    {% for w in wikis %}
-	      <tr>
-	        <td><a href="{% url 'wikipage' w.child.id wiki.id %}" style="text-decoration: none; color:black;">{{w.child.titulo}} | {{w.child.tipo.category}}
-	        </a></td>
-	      </tr>
-	     {% endfor %}
-	    </tbody>
-	  </table>
+
+
+
+	<div class="image-grid">
+		{% for w in wikis %}
+			<a href="{% url 'wikipage' w.child.id wiki.id %}" style="text-decoration: none; color:black;">
+			{% if w.child.mainPic %}
+    
+		   	<div class="image-card">
+		        <img src="{{ w.child.mainPic }}" alt="">
+		        <p class="image-caption">{{ w.child.titulo }}</p>
+		    </div>
+
+		    {% else %}
+
+		    <div class="image-card">
+		        <img src="/media/assets/blank-profile-picture.png" alt="">
+		        <p class="image-caption">{{w.child.titulo}}</p>
+		    </div>
+
+		    {% endif %}
+		</a>
+    	{% endfor %}
+
 	</div>
 
 

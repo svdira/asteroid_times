@@ -1276,7 +1276,7 @@ def addTimesItem(request):
 		categoria = Category.objects.get(pk=int(cat_id))
 		contenido = request.POST.get("contenido")
 
-		if categoria.category.lower() in ['book','bunko','manga series','comic book','movie','anime season','anime film','tv series','show season','persona','album','band']:
+		if categoria.category.lower() in ['manga volume','book','bunko','manga series','comic book','movie','anime season','anime film','tv series','show season','persona','album','band']:
 		    newI = Item.objects.create(titulo=titulo,tipo=categoria,contenido=contenido,fecha_creacion='1999-12-31', fecha_edicion='1999-12-31')
 		    newI.save()
 		else:
