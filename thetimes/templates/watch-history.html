@@ -12,7 +12,7 @@
   {% for b in books %}
     <li>
       <span class="main-item"><a href="{% url 'item' b.item.id %}" style="text-decoration:none; color:black;">{{b.item.titulo}} {{b.item.periodo}}</a></span>
-      <small class="sub-item"> {{b.fec_fin}}{% if b.item.credit_links %} | By {{b.item.credit_links|safe}}{% endif %}</small>
+      {% if this_y != 1999 %}<small class="sub-item"> {{b.fec_fin}}{% if b.item.credit_links %} | By {{b.item.credit_links|safe}}{% endif %}</small>{% endif %}
     </li>
   {% endfor %}
   </ul>

@@ -26,6 +26,7 @@ urlpatterns = [
 	path('liga-equipo/<liga>/<equipo>', views.ligaEquipo, name='ligaEquipo'),
 	path('liga-fase/<liga>/<fase>', views.ligaFase, name='ligaFase'),
 	path('add-match/<liga>', views.addMatch, name='addMatch'),
+	path('edit-match/<partido>', views.editMatch, name='editMatch'),
 	path('partido/<p>', views.partido, name='partido'),
 	path('futbol/<p>', views.futbol, name='futbol'),
 	path('reg-gol/', views.regGol, name='regGol'),

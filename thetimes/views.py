@@ -102,6 +102,9 @@ def editItem(request,i):
 				newI = AttrImage.objects.create(item=this_item, imagen=photo,caption=caption,tipo=tipo)
 				newI.save()
 
+				if this_item.tipo.category.lower() == 'movie' and tipo=='cover':
+				    return redirect(f"/item/{this_item.id}")
+
 		if request.POST.get("formulario")=='5':
 			nom = request.POST.get("attrNvo")
 			val = request.POST.get("attrVal")
@@ -400,6 +403,9 @@ def movieHistory(request):
 	this_y = max_year.fec_fin.year if int(get_y) == 1 else int(get_y)
 
 	books = Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False, fec_fin__year=this_y).order_by('-fec_fin')
+	if this_y == 1999:
+	    books = sorted(Consumo.objects.filter(item__tipo__category='Movie',fec_fin__isnull=False, fec_fin__year=this_y), key=lambda t: t.item.periodo, reverse=False)
+
 	rbooks = len(books)
 	qbooks = Item.objects.filter(tipo__category='Movie',consumo__item__isnull=True, consumido=False).count()
 	in_progress = Consumo.objects.filter(item__tipo__category='Movie', fec_fin__isnull=True)
@@ -680,7 +686,7 @@ def addMatch(request,liga):
 	equipos = RelTorneoEquipo.objects.filter(torneo=this_liga).order_by('equipo__nombre')
 	ult_partido = Partido.objects.latest('id')
 
-	recent_partidos = Partido.objects.all().order_by('-id')[0:16]
+	recent_partidos = Partido.objects.filter(torneo=this_liga).order_by('-id')[0:16]
 
 	if request.method == 'POST':
 		local = Equipo.objects.get(pk=int(request.POST.get("local")))
@@ -695,6 +701,38 @@ def addMatch(request,liga):
 
 
 	return render(request,'add-match.html',{'cats':cats,'this_liga':this_liga,'equipos':equipos,'up':ult_partido,'ligas':ligas,'rp':recent_partidos})
+
+
+def editMatch(request,partido):
+	this_partido = Partido.objects.get(pk=int(partido))
+	this_liga = Torneo.objects.get(pk=int(this_partido.torneo.id))
+	ligas = Torneo.objects.all().order_by('-id')
+	cats = sorted(Category.objects.exclude(id=14),key=lambda t: t.nitems, reverse=True)
+	equipos = RelTorneoEquipo.objects.filter(torneo=this_liga).order_by('equipo__nombre')
+	ult_partido = Partido.objects.latest('id')
+
+	recent_partidos = Partido.objects.filter(torneo=this_liga).order_by('-id')[0:16]
+
+	if request.method == 'POST':
+		local = Equipo.objects.get(pk=int(request.POST.get("local")))
+		visit = Equipo.objects.get(pk=int(request.POST.get("visit")))
+		fase = request.POST.get("fase")
+		fecha = request.POST.get("fecha")
+
+		this_partido.fecha = fecha
+		this_partido.local = local
+		this_partido.visita = visit 
+		this_partido.fase = fase
+		this_partido.save()
+
+		return redirect(f'/partido/{this_partido.id}')
+
+
+
+	return render(request,'edit-match.html',{'cats':cats,'this_partido':this_partido,'this_liga':this_liga,'equipos':equipos,'up':ult_partido,'ligas':ligas,'rp':recent_partidos})
+
+
+
 
 def partido(request,p):
 	ligas = Torneo.objects.all().order_by('-id')
@@ -1200,6 +1238,9 @@ def viewphotos(request,i,w):
 
 def quemar(request,i):
     Item.objects.filter(id=int(i)).update(consumido=True)
+    this_item = Item.objects.get(pk=int(i))
+    newc = Consumo.objects.create(item=this_item, fec_ini = '1999-12-31',fec_fin='1999-12-31',formato='dvd',unidades='minutos',cantidad=120,multiplicador=1,consumo=120)
+    newc.save()
     return redirect(f'/item/{i}')
 
 

@@ -160,7 +160,7 @@ class Item(models.Model):
 
     @property
     def aplica_consumo(self):
-        if self.tipo.category.lower() in ['book','movie','bunko','anime season','show season','miniseries','anime film','manga series','album','manga volume']:
+        if self.tipo.category.lower() in ['book','movie','bunko','anime season','tv series','show season','miniseries','anime film','manga series','album','manga volume']:
             return True
         else:
             return None

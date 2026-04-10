@@ -16,7 +16,7 @@
 
 {% if this_partido.terminado == False %}
 
-<h2>{{this_partido.headline}} @ <a href="{% url 'liga' this_partido.torneo.id  %}">{{this_partido.torneo.nombre}}</a></h2>
+<h2>{{this_partido.headline}} @ <a href="{% url 'liga' this_partido.torneo.id  %}" style="text-decoration: none; color:blue;">{{this_partido.torneo.nombre}}</a> | {{this_partido.fecha}} | <a href="{% url 'editMatch' this_partido.id  %}" style="text-decoration: none; color:grey;">Edit</a></h2>
 
 <form method="POST">
   {% csrf_token %}
