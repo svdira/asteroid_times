@@ -1,0 +1,32 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+<div class="form-card">
+    <h2>{{this_persona.nombre}}</h2>
+    {{this_persona.mdOutput|safe}}
+
+    {% if creditos %}
+
+
+    <h2>Libros</h2>
+
+
+<div class="table-wrapper">
+      <table>
+        <tbody>
+        {% for r in creditos %}
+          <tr>
+            <td><a href="{% url 'titulo' r.libro.id %}" style="text-decoration: none; color:black;">{{r.libro.titulo}} ({{r.libro.anho_publicacion}})</a></td>
+          </tr>
+         {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+{% endif %}
+</div>
+
+{% endblock %}

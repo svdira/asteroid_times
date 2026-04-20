@@ -14,7 +14,7 @@
 		{% for w in wikis %}
 			<a href="{% url 'wikipage' w.child.id wiki.id %}" style="text-decoration: none; color:black;">
 			{% if w.child.mainPic %}
-    
+
 		   	<div class="image-card">
 		        <img src="{{ w.child.mainPic }}" alt="">
 		        <p class="image-caption">{{ w.child.titulo }}</p>
@@ -23,7 +23,9 @@
 		    {% else %}
 
 		    <div class="image-card">
-		        <img src="/media/assets/blank-profile-picture.png" alt="">
+		         <div class="image-box image-fallback">
+           	    {{ w.child.titulo }}
+        	    </div>
 		        <p class="image-caption">{{w.child.titulo}}</p>
 		    </div>
 

@@ -1,0 +1,44 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<div class="form-card">
+
+
+	<h2>Perfiles</h2>
+
+	<div class="image-grid">
+		{% for w in wikis %}
+			<a href="{% url 'editNota' w.id 'view' %}" style="text-decoration: none; color:black;">
+			
+
+		    <div class="image-card">
+		         <div class="image-box image-fallback">
+           	    {{ w.encabezado }}
+        	    </div>
+		    </div>
+
+		</a>
+    	{% endfor %}
+
+	</div>
+
+
+
+<ul class="pagination">
+
+   {% if wikis.has_previous %}
+        <li><a href="?page={{ wikis.previous_page_number }}">Previous</a></li>
+    {% endif %}
+
+    <li><a href="#">Page {{ wikis.number }} of {{ wikis.paginator.num_pages }}</a> </li>
+
+    {% if wikis.has_next %}
+        <li><a href="?page={{ wikis.next_page_number }}">Next</a></li>
+    {% endif %}
+
+</ul>
+</div>
+
+{% endblock %}

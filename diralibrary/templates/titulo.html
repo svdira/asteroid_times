@@ -1,0 +1,85 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+<div class="form-card">
+    <h2>{{this_titulo.titulo}} ({{this_titulo.anho_publicacion}})</h2>
+
+     {% if this_titulo.mainPic %}
+
+     <div class="tech-details">
+        <div class="tech-title">{{this_titulo.titulo}}</div>
+
+        <dl>
+            {% if this_titulo.mainPic %}
+            <dd><img src="{{this_titulo.mainPic}}" class='tech-image'></dd>
+            {% endif %}
+
+            {% if consumos %}
+                <dt>Lecturas</dt>
+                <dd>
+                    {% for c in consumos %}
+                    &nbsp;&nbsp;{{c.fecha_fin}}<br>
+                    {% endfor %}
+                </dd>
+            {% endif %}
+
+            <dt>Acciones</dt>
+            <dd>&nbsp;&nbsp;<a href="{% url 'comenzar' this_titulo.id %}" style="text-decoration: none;">Registrar lectura</a><br>
+            &nbsp;&nbsp;<a href="{% url 'aggCredito' this_titulo.id %}" style="text-decoration: none;">Agregar credito</a>      
+            </dd>
+
+
+        </dl>
+    </div>
+
+    {% endif %}
+
+    <p>By {{this_titulo.tcredits|safe}}</p>
+
+    {{this_titulo.mdOutput|safe}}
+
+    {% if comentarios %}
+
+    <h3>Notas</h3>
+
+    {% for n in comentarios %}
+     <p style="font-family:Arial,Helvetica,sans-serif; color:gray;"> {%if n.encabezado %}{{n.encabezado}} |{%endif%} {{n.tiempo|date:"M j, Y"}} | <a href="{% url 'editNota' n.id 'edit' %}">edit</a></p>
+
+
+     {{n.texto|linebreaks}}
+
+    {% endfor %}
+
+    {% endif %}
+
+    <div style="clear:both;"></div>
+</div>
+
+<br>
+<div class="form-card">
+      <form method="POST" action="{% url 'comentar' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+    <input type="hidden" name="tid" value="{{this_titulo.id}}">
+    <div class="form-group">
+            <label>Comentar</label>
+            <textarea name="comentario" rows="10"></textarea>
+        </div>
+
+
+        <div class="form-group">
+            <label>Encabezado Opcional</label>
+            <input type="text" name="encabezado">
+        
+        </div>
+
+      
+        <button class="btn btn-primary">Comentar</button>
+        
+    </form>
+</div>
+
+{% endblock %}

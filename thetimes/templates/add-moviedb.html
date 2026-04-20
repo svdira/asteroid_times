@@ -8,35 +8,38 @@
 
 <h2>Add New Movie</h2>
 
-  <form method="POST" action="{% url 'savemovie' %}">
+  <form method="POST" action="{% url 'savemovie' %}" enctype="multipart/form-data">
     {% csrf_token %}
 
       <label for="exampleFormControlInput1">Title</label><br>
       <input type = "text" name="title" value="{{str_titulo}}" style="padding-top:0.5em; padding-bottom: 0.5em;">
-  
+
     <br><br>
 
       <label for="exampleFormControlInput1" >Premiere</label><br>
       <input type = "text" name="premiere" value="{{str_premiere}}" style="padding-top:0.5em; padding-bottom: 0.5em;">
 
       <br><br>
- 
+
       <label for="exampleFormControlInput1">Runtime</label><br>
       <input type = "text" name="runtime" value="{{str_runtime}}" style="padding-top:0.5em; padding-bottom: 0.5em;"><br><br>
 
       <label for="exampleFormControlTextarea1">Movie Info</label><br>
       <textarea name = "info" style="padding-top:0.5em; padding-bottom: 0.5em; width: 95%;" rows="3" >{{str_overview}}</textarea>
-    
+
     <br><br>
 
- 
+
       <label for="exampleFormControlInput1">Director</label><br>
       <input type = "text" name="director" value="{{str_director}}" style="padding-top:0.5em; padding-bottom: 0.5em;">
- 
+
     <br><br>
 
       <label for="exampleFormControlTextarea1">Cast</label><br>
       <textarea name = "cast"  style="padding-top:0.5em; padding-bottom: 0.5em; width: 95%;" rows="3">{{str_cast}}</textarea>
+  <br><br>
+  <label for="exampleFormControlTextarea1">Cover</label><br>
+  <input type="file" name = "imagen">
   <br>
     <button type="submit" class="btn btn-primary">Add Movie</button>
   </form>

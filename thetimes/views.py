@@ -162,17 +162,8 @@ def editItem(request,i):
 
 
 def homepage(request):
-	page = request.GET.get('page', 1)
-	articles = Item.objects.exclude(tipo__id__in=[3,8,11,14,22,6,23,24,25]).order_by('-fecha_creacion')
-	paginator = Paginator(articles, 12)
-	resultados = paginator.get_page(page)
-	cats = sorted(Category.objects.exclude(id__in=[22,6,23,24,25]),key=lambda t: t.nitems, reverse=True)
-	if page == 1:
-	    in_progress = Consumo.objects.filter(fec_fin__isnull=True).order_by('-id')
-	else:
-	    in_progress = None
 
-	return render(request,'homepage.html',{'articles':resultados,'cats':cats,'in_progress':in_progress})
+	return redirect('/lib/inicio/')
 
 def gallery(request,item_id):
 	page = request.GET.get('page', 1)
@@ -721,7 +712,7 @@ def editMatch(request,partido):
 
 		this_partido.fecha = fecha
 		this_partido.local = local
-		this_partido.visita = visit 
+		this_partido.visita = visit
 		this_partido.fase = fase
 		this_partido.save()
 
@@ -1018,6 +1009,7 @@ def savemovie(request):
 	mpremiere = request.POST.get("premiere")
 	mruntime = request.POST.get("runtime")
 	minfo = request.POST.get("info")+"==headtext=="
+	photo = request.FILES.get("imagen")
 
 	tipo = Category.objects.get(pk=2)
 
@@ -1031,6 +1023,9 @@ def savemovie(request):
 	newA.save()
 
 	newA = AttrInteger.objects.create(item=this_item,att_name='runtime',att_value=int(mruntime))
+	newA.save()
+
+	newA =  AttrImage.objects.create(item=this_item, imagen=photo,caption='movie poster',tipo='cover')
 	newA.save()
 
 
@@ -1049,7 +1044,7 @@ def savemovie(request):
 
 
 
-	return redirect('/edit-item/{}'.format(this_item.id))
+	return redirect('/item/{}'.format(this_item.id))
 
 
 def movieCredits(request,nombre):

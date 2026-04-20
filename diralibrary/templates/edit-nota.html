@@ -1,0 +1,36 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+<div class="form-card">
+
+    {% if tipo == 'edit' or tipo == 'edit-perfil' %}
+    <form method="POST">
+    	{% csrf_token %}
+        <div class="form-group">
+            <label>Encabezado</label>
+            <input type="text" name="encabezado" value="{{this_nota.encabezado}}">
+        
+        </div>
+
+        <div class="form-group">
+            <label>Contenido</label>
+            <textarea name="texto" rows="8">{{this_nota.texto}}</textarea>
+        </div>
+
+      
+        <button class="btn btn-primary">Guardar</button>
+        
+    </form>
+    {% else %}
+
+    <h2>{{this_nota.encabezado}} <a href="{% url 'editNota' this_nota.id 'edit-perfil' %}" style="text-decoration: none;">&#9999;</a></h2>
+    {{this_nota.texto|linebreaks}}
+
+
+    {% endif %}
+</div>
+
+{% endblock %}

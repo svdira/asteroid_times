@@ -1,0 +1,70 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+<div class="form-card">
+    <form method="POST" enctype="multipart/form-data">
+    	{% csrf_token %}
+        <div class="form-group">
+            <label>Titulo</label>
+            <input type="text" name="titulo">
+        </div>
+        <div class="form-group">
+            <label>Titulo Original</label>
+            <input type="text" name="titulo_original">
+        </div>
+
+         <div class="form-group">
+            <label>Autor</label>
+            <select name="pid">
+                {% for p in personas %}
+                    <option value="{{p.id}}">{{p.nombre}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div >
+        <div class="form-group" style="width: 48%; float:left; margin-right: 4%;">
+            <label>Fec. Pub.</label>
+            <input type="text" name="fecha_publicacion">
+        </div>
+        <div class="form-group" style="width: 48%; float:left;">
+            <label>Idioma Orig.</label>
+            <input type="text" name="idioma_original">
+        </div>
+        </div>
+
+        <div style="clear:both;"></div>
+
+
+        <div >
+        <div class="form-group" style="width: 48%; float:left; margin-right: 4%;">
+            <label>Tipo</label>
+            <select name="tipo">
+                {% for t in tipos %}
+                    <option value="{{t.id}}">{{t.nombre}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="width: 48%; float:left;">
+            <label>Cover</label>
+            <input type="file" name = "imagen">&nbsp;
+        </div>
+        </div>
+
+        <div style="clear:both;"></div>
+
+        <div class="form-group">
+            <label>Synopsis</label>
+            <textarea name="synopsis" rows="10"></textarea>
+        </div>
+
+      
+        <button class="btn btn-primary">Save Changes</button>
+        
+    </form>
+</div>
+
+{% endblock %}

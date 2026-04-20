@@ -605,13 +605,10 @@ width: 100%;}
 </head>
 <body>
   <div class="contenedor">
-    <div class="encabezado" sytle="padding:0px; margin: 0px;">
-      <a href="{% url 'homepage' %}"><img src="/media/assets/times_logo.png" alt="Imagen encabezado"></a>
-    </div>
-
+  
     <!-- Fecha centrada -->
     <div class="fecha">
-      {% block cinta %}<a href="{% url 'searchPage' %}" style="text-decoration:none; color:grey;">Search</a> | <a href="{% url 'menu' %}" style="text-decoration:none; color:grey;">Menu</a> | <a href="{% url 'bookHistory' %}" style="text-decoration:none; color:grey;">Books</a> | <a href="{% url 'movieHistory' %}" style="text-decoration:none; color:grey;">Movies</a> | <a href="{% url 'futbol' 0 %}" style="text-decoration:none; color:grey;">Futbol</a> | <a href="{% url 'addItem' %}" style="text-decoration:none; color:grey;">Add</a>{% endblock %}
+      {% block cinta %} <a href="{% url 'inicio' %}" style="text-decoration:none; color:grey;">Library</a> | <a href="{% url 'futbol' 0 %}" style="text-decoration:none; color:grey;">Futbol</a> {% endblock %}
     </div>
 
     <div class="contenido">

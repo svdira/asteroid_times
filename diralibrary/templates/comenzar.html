@@ -1,0 +1,70 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+<div class="form-card">
+    <h2>Registrar lectura de {{this_titulo.titulo}} ({{this_titulo.anho_publicacion}})</h2>
+    <form method="POST" enctype="multipart/form-data">
+    	{% csrf_token %}
+
+        <div >
+        <div class="form-group" style="width: 48%; float:left; margin-right: 4%;">
+            <label>Fec. Inicio</label>
+            <input type="text" name="fecha_ini">
+        </div>
+        <div class="form-group" style="width: 48%; float:left;">
+            <label>Fec. Fin</label>
+            <input type="text" name="fecha_fin">
+        </div>
+        </div>
+
+        <div style="clear:both;"></div>
+
+
+       <div >
+        <div class="form-group" style="width: 48%; float:left; margin-right: 4%;">
+            <label>Formato</label>
+            <select name="formato">
+                <option value="impreso">Impreso</option>
+                <option value="kindle">Kindle</option>
+                <option value="boox">Book</option>
+            </select>
+        </div>
+        <div class="form-group" style="width: 48%; float:left;">
+            <label>Idioma</label>
+            <select name="idioma">
+                <option value="EN">English</option>
+                <option value="ES">Español</option>
+            </select>
+        </div>
+        </div>
+
+        <div style="clear:both;"></div>
+
+
+         <div >
+        <div class="form-group" style="width: 48%; float:left; margin-right: 4%;">
+            <label>Unidades</label>
+            <select name="unidades">
+                <option value="paginas">Páginas</option>
+                <option value="location">Location</option>
+            </select>
+        </div>
+        <div class="form-group" style="width: 48%; float:left;">
+            <label>Cantidad</label>
+            <input type="text" name="cantidad">
+        </div>
+        </div>
+
+        <div style="clear:both;"></div>
+
+
+      
+        <button class="btn btn-primary">Registrar</button>
+        
+    </form>
+</div>
+
+{% endblock %}

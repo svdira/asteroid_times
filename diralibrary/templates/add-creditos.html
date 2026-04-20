@@ -1,0 +1,38 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+<div class="form-card">
+    <h2>Agg credito a {{this_titulo.titulo}} ({{this_titulo.anho_publicacion}})</h2>
+    <form method="POST" enctype="multipart/form-data">
+    	{% csrf_token %}
+        <div class="form-group">
+            <label>Credito</label>
+            <select name="credito">
+               <option value="autor">Autor</option>
+               <option value="ilustrador">Ilustrador</option>
+               <option value="traductor">Traductor</option>
+               <option value="prologo">Prologo</option>
+            </select>
+        </div>
+       
+
+         <div class="form-group">
+            <label>Persona</label>
+            <select name="pid">
+                {% for p in personas %}
+                    <option value="{{p.id}}">{{p.nombre}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+      
+        <button class="btn btn-primary">Add Credito</button>
+        
+    </form>
+</div>
+
+{% endblock %}

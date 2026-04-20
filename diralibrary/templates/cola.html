@@ -1,0 +1,47 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<div class="form-card">
+
+<h2>Libros en cola</h2>
+
+{% if resultados %}
+
+
+<div class="table-wrapper">
+	  <table>
+	    <tbody>
+	    {% for r in resultados %}
+	      <tr>
+	        <td><a href="{% url 'titulo' r.id %}" style="text-decoration: none; color:black;">{{r.titulo}} ({{r.anho_publicacion}})</a> | {{r.tcredits|safe}}</td>
+	      </tr>
+	     {% endfor %}
+	    </tbody>
+	  </table>
+	</div>
+
+{% endif %}
+</div><br>
+
+<div class="form-card">
+
+
+<ul class="pagination">
+
+   {% if wikis.has_previous %}
+        <li><a href="?page={{ resultados.previous_page_number }}">Previous</a></li>
+    {% endif %}
+
+    <li><a href="#">Page {{ resultados.number }} of {{ resultados.paginator.num_pages }}</a> </li>
+
+    {% if wikis.has_next %}
+        <li><a href="?page={{ resultados.next_page_number }}">Next</a></li>
+    {% endif %}
+
+</ul>
+
+</div>
+
+{% endblock %}
