@@ -19,7 +19,7 @@
         <tbody>
         {% for r in creditos %}
           <tr>
-            <td><a href="{% url 'titulo' r.libro.id %}" style="text-decoration: none; color:black;">{{r.libro.titulo}} ({{r.libro.anho_publicacion}})</a></td>
+            <td>{% if r.libro.leido %}&#9989;&nbsp;{% endif %}<a href="{% url 'titulo' r.libro.id %}" style="text-decoration: none; color:black;">{{r.libro.titulo}} ({{r.libro.anho_publicacion}})</a></td>
           </tr>
          {% endfor %}
         </tbody>

@@ -83,6 +83,7 @@ def addTitulo(request):
 				tipo = 'cover',
 				vista=False)
 			newC.save()
+		return redirect(f"/lib/titulo/{newB.id}")
 
 	return render(request,'add-titulo.html',{'tipos':tipos,'personas':personas})
 
@@ -107,7 +108,7 @@ def aggNota(request):
 		ischar = True
 	else:
 		ischar = False
-	
+
 	newC = Comentario.objects.create(titulo=this_titulo,texto=post_comm, encabezado=encabezado, es_personaje=ischar)
 
 	newC.save()
@@ -131,7 +132,7 @@ def editNota(request,nota,tipo):
 			return redirect(f"/lib/titulo/{this_nota.titulo.id}")
 
 
-		
+
 	return render(request,'edit-nota.html',{'this_nota':this_nota,'tipo':tipo})
 
 def aggCredito(request,titulo):
@@ -176,8 +177,8 @@ def comenzar(request,titulo_id):
 		newC.save()
 
 		return redirect(f'/lib/titulo/{this_titulo.id}')
-		
-		
+
+
 	return render(request,'comenzar.html',{'this_titulo':this_titulo})
 
 def inicio(request):
@@ -186,11 +187,20 @@ def inicio(request):
 	now_reading = Consumo.objects.filter(fecha_fin__isnull=True).order_by('-fecha_ini')
 	paginator = Paginator(lecturas, 12)
 	resultados = paginator.get_page(page)
-	return render(request,'inicio.html',{'now_reading':now_reading	,'resultados':resultados})
+	return render(request,'inicio.html',{'page':page,'now_reading':now_reading	,'resultados':resultados})
+
+def frontpage(request):
+	page = request.GET.get('page', 1)
+	lecturas = Entrada.objects.all().order_by('-fecha')
+	paginator = Paginator(lecturas, 12)
+	resultados = paginator.get_page(page)
+	return render(request,'frontpage.html',{'page':page,'resultados':resultados})
+
+
 
 def cola(request):
 	page = request.GET.get('page', 1)
-	lecturas = Titulo.objects.filter(consumo__titulo__isnull=True).order_by('-anho_publicacion')
+	lecturas = Titulo.objects.filter(consumo__titulo__isnull=True).order_by('anho_publicacion','fecha_publicacion')
 	paginator = Paginator(lecturas, 50)
 	resultados = paginator.get_page(page)
 	return render(request,'cola.html',{'resultados':resultados})
@@ -205,5 +215,56 @@ def perfiles(request):
 
 def terminarLectura(request):
 	Consumo.objects.filter(id=int(request.POST.get("consumo"))).update(fecha_fin=request.POST.get("fecha_fin"))
-	return redirect(f"/lib/titulo/{request.POST.get("tid")}") 
+	tid = request.POST.get('tid')
+	return redirect(f"/lib/titulo/{tid}")
+
+def addEntrada(request):
+	if request.method == 'POST':
+		p_tipo = request.POST.get("tipo")
+		p_fecha = request.POST.get("fecha")
+		date_obj = datetime.strptime(p_fecha, "%Y-%m-%d")
+		formatted_date = date_obj.strftime("%A, %B %e, %Y")
+		p_titulo = formatted_date if p_tipo == 'journal' else request.POST.get("titulo")
+		p_contenido = request.POST.get("contenido")
+		p_atributos = request.POST.get("atributos")
+		atts = p_atributos if len(p_atributos)>0 else 'tba'
+		aplicaConsumo = True if p_tipo in ["movie","miniseries","anime","show"] else False
+
+		if request.FILES.get("imagen"):
+			newE = Entrada.objects.create(encabezado=p_titulo,
+				fecha = p_fecha,
+				tipo = p_tipo,
+				texto = p_contenido,
+				aplicaConsumo = aplicaConsumo ,
+				atributos = atts,
+				imagen = request.FILES.get("imagen"))
+		else:
+			newE = Entrada.objects.create(encabezado=p_titulo,
+				fecha = p_fecha,
+				tipo = p_tipo,
+				texto = p_contenido,
+				aplicaConsumo = aplicaConsumo ,
+				atributos = atts)
+
+		newE.save()
+
+		return redirect("/lib/frontpage")
+	return render(request,'add-entrada.html',{})
+
+def entrada(request,entrada_id):
+
+	this_entrada = Entrada.objects.get(pk=int(entrada_id))
+	return render(request,'entrada.html',{'this_entrada':this_entrada})
+
+def editEntrada(request,entrada_id):
+	this_entrada = Entrada.objects.get(pk=int(entrada_id))
+
+	if request.method == 'POST':
+		this_entrada.texto = request.POST.get("contenido")
+		this_entrada.save()
+		return redirect(f"/lib/entrada/{this_entrada.id}")
+
+	
+	return render(request,'edit-entrada.html',{'this_entrada':this_entrada})
+
 

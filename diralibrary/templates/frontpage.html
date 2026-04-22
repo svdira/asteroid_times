@@ -1,0 +1,42 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+
+{% if resultados %}
+
+{% for r in resultados %}
+<div class="form-card">
+	<h3><a href="{% url 'entrada' r.id %}" style="text-decoration: none; color: #007bff;;">{{r.encabezado}}</a></h3>
+
+	<p style="font-family:Arial,Helvetica,sans-serif; color:gray;">{{r.fecha}} | {{r.tipo}} </p>
+
+	{{r.texto|truncatewords:50|linebreaks}}
+
+</div>	<br>
+{% endfor %}
+{% endif %}
+
+
+<div class="form-card">
+
+
+<ul class="pagination">
+
+   {% if resultados.has_previous %}
+        <li><a href="?page={{ resultados.previous_page_number }}">Previous</a></li>
+    {% endif %}
+
+    <li><a href="#">Page {{ resultados.number }} of {{ resultados.paginator.num_pages }}</a> </li>
+
+    {% if resultados.has_next %}
+        <li><a href="?page={{ resultados.next_page_number }}">Next</a></li>
+    {% endif %}
+
+</ul>
+
+</div>
+
+{% endblock %}

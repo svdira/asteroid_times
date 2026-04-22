@@ -1,0 +1,33 @@
+{% extends 'base_lib.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+<div class="form-card">
+    <h2>{{this_entrada.encabezado}}</h2>
+
+    <p style="font-family:Arial,Helvetica,sans-serif; color:gray;">{{this_entrada.fecha}} | {{this_entrada.tipo}} | <a href="{% url 'editentrada' this_entrada.id %}">ed</a></p>
+
+     {% if this_entrada.imagen %}
+
+     <div class="tech-details">
+      
+
+        <dl>
+     
+            <dd><img src="{{this_entrada.thumbnail_path}}" class='tech-image'></dd>
+        </dl>
+    </div>
+
+    {% endif %}
+
+
+    {{this_entrada.texto|linebreaks}}
+
+     <div style="clear:both;"></div>
+
+  </div>
+
+
+{% endblock %}

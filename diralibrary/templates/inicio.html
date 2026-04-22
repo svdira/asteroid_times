@@ -3,12 +3,12 @@
 
 {% block contenido %}
 
-{% if now_reading %}
+{% if now_reading and page == 1 %}
 
 {% for n in now_reading %}
 
 <div class="form-card">
-    <h2><a href="{% url 'titulo' n.titulo.id %}" style="text-decoration: none; color: orange;">{{n.titulo.titulo}} ({{n.titulo.anho_publicacion}})</a></h2>
+    <h3><a href="{% url 'titulo' n.titulo.id %}" style="text-decoration: none; color: orange;">{{n.titulo.titulo}} ({{n.titulo.anho_publicacion}})</a></h3>
 
     <p style="font-family:Arial,Helvetica,sans-serif; color:gray;">Now Reading</p>
     <form method="POST" action = "{% url 'terminar' %}" enctype="multipart/form-data">
@@ -30,9 +30,9 @@
 
     <div style="clear:both ;"></div>
 
-        
- 
-    
+
+
+
     {{n.titulo.headtext|safe}}
 
 
@@ -51,7 +51,7 @@
 
 {% for r in resultados %}
 <div class="form-card">
-	<h2><a href="{% url 'titulo' r.titulo.id %}" style="text-decoration: none; color: #007bff;;">{{r.titulo.titulo}} ({{r.titulo.anho_publicacion}})</a></h2>
+	<h3><a href="{% url 'titulo' r.titulo.id %}" style="text-decoration: none; color: #007bff;;">{{r.titulo.titulo}} ({{r.titulo.anho_publicacion}})</a></h3>
 
 	<p style="font-family:Arial,Helvetica,sans-serif; color:gray;">{{r.fecha_fin}} | {{r.titulo.tcredits|safe}}</p>
 
@@ -67,13 +67,13 @@
 
 <ul class="pagination">
 
-   {% if wikis.has_previous %}
+   {% if resultados.has_previous %}
         <li><a href="?page={{ resultados.previous_page_number }}">Previous</a></li>
     {% endif %}
 
     <li><a href="#">Page {{ resultados.number }} of {{ resultados.paginator.num_pages }}</a> </li>
 
-    {% if wikis.has_next %}
+    {% if resultados.has_next %}
         <li><a href="?page={{ resultados.next_page_number }}">Next</a></li>
     {% endif %}
 

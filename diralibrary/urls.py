@@ -17,4 +17,8 @@ urlpatterns = [
 	path('agg-credito/<titulo>', views.aggCredito, name='aggCredito'),
 	path('nota/<nota>/<tipo>', views.editNota, name='editNota'),
 	path('perfiles/', views.perfiles, name='perfiles'),
+	path('add-entrada/', views.addEntrada, name='addentrada'),
+	path('frontpage/', views.frontpage, name='frontpage'),
+	path('entrada/<entrada_id>', views.entrada, name='entrada'),
+	path('edit-entrada/<entrada_id>', views.editEntrada, name='editentrada'),
 ]

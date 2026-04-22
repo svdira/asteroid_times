@@ -101,6 +101,14 @@ class Titulo(models.Model):
 		clinks = enlaces[:-7]
 		return clinks
 
+	@property
+	def leido(self):
+	    conteo = Consumo.objects.filter(titulo = self).count()
+
+	    valor = True if conteo > 0 else False
+
+	    return valor
+
 	def __str__(self):
 		return self.titulo
 
@@ -173,5 +181,34 @@ class Cubiertas(models.Model):
 
     def __str__(self):
         return self.tipo + ' @ ' + self.titulo.titulo
+
+class Entrada(models.Model):
+	encabezado = models.CharField(max_length=512)
+	fecha = models.DateField()
+	edicionTS = models.DateTimeField(auto_now=True)
+	tipo = models.CharField(max_length=512)
+	texto = models.TextField()
+	aplicaConsumo = models.BooleanField()
+	atributos = models.TextField()
+	imagen = models.ImageField(upload_to=path_and_name, max_length=255, null=True, blank=True)
+	parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+	def save(self, *args, **kwargs):
+		super().save(*args, **kwargs)
+		if self.imagen:
+			img_path = self.imagen.path
+			thumb_path = os.path.join(os.path.dirname(img_path), "thumbnails/" + os.path.basename(img_path))
+			img = Image.open(img_path)
+			img.thumbnail((400, 400))  # <--- thumbnail size
+			img.save(thumb_path)
+
+	@property
+	def thumbnail_path(self):
+		parts = self.imagen.url.split('/')
+		parts.insert(3, 'thumbnails')
+		result = '/'.join(parts)
+		return result
+
+	def __str__(self):
+		return f"Entry {self.id} - {self.encabezado}"
 
 

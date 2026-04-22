@@ -10,3 +10,4 @@ admin.site.register(Consumo)
 admin.site.register(Cubiertas)
 
 admin.site.register(Comentario)
+admin.site.register(Entrada)
